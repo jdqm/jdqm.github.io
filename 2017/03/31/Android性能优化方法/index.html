@@ -1,0 +1,888 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android,性能优化," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="前言
+Q：为什么要进行性能优化？ Android作为移动平台，不管是内存或者cpu的性能都受到了一定的限制？过多的使用内存会导致OOM，过多的使用cpu资源，一般指做大量的耗时任务，将会是设备变得卡顿甚至出现ANR（应用程序无响应）异常。
+优化的方式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android性能优化方法">
+<meta property="og:url" content="http://www.shengyang.me/2017/03/31/Android性能优化方法/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="前言
+Q：为什么要进行性能优化？ Android作为移动平台，不管是内存或者cpu的性能都受到了一定的限制？过多的使用内存会导致OOM，过多的使用cpu资源，一般指做大量的耗时任务，将会是设备变得卡顿甚至出现ANR（应用程序无响应）异常。
+优化的方式">
+<meta property="og:updated_time" content="2017-03-31T14:44:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android性能优化方法">
+<meta name="twitter:description" content="前言
+Q：为什么要进行性能优化？ Android作为移动平台，不管是内存或者cpu的性能都受到了一定的限制？过多的使用内存会导致OOM，过多的使用cpu资源，一般指做大量的耗时任务，将会是设备变得卡顿甚至出现ANR（应用程序无响应）异常。
+优化的方式">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":5,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.shengyang.me/2017/03/31/Android性能优化方法/"/>
+
+
+
+
+
+  <title> Android性能优化方法 | Jdqm Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jdqm Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">个人博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.shengyang.me/2017/03/31/Android性能优化方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Android性能优化方法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-31T16:54:16+08:00">
+                2017-03-31
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-03-31T22:44:29+08:00">
+                2017-03-31
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/31/Android性能优化方法/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-eye"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前言</p>
+<h2 id="Q：为什么要进行性能优化？"><a href="#Q：为什么要进行性能优化？" class="headerlink" title="Q：为什么要进行性能优化？"></a>Q：为什么要进行性能优化？</h2><p> Android作为移动平台，不管是内存或者cpu的性能都受到了一定的限制？过多的使用内存会导致OOM，过多的使用cpu资源，一般指做大量的耗时任务，将会是设备变得卡顿甚至出现ANR（应用程序无响应）异常。</p>
+<p><strong>优化的方式</strong><br><a id="more"></a></p>
+<h2 id="I-布局优化"><a href="#I-布局优化" class="headerlink" title="I.  布局优化"></a>I.  布局优化</h2><p>布局优化的思想：尽量减少布局的层级，减少绘制界面时的工作量。具体如何做：<br><strong>方式一：</strong><br>①去除一些无用的布局，View;<br>②有选择性的使用布局：比如能使用RelativeLayout也可以使用使用LinearLayout的地方使用后者，尽量少使用性能低的ViewGroup;<br>③减少层级优先级高于对ViewGroup性能的考虑。</p>
+<p><strong>方式二：</strong>使用<code>&lt;include&gt;</code>、<code>&lt;merge&gt;</code>标签和<code>&lt;ViewStub&gt;</code>，<code>&lt;include&gt;</code>标签用于布局重用，<code>&lt;merge&gt;</code>标签一般和<code>&lt;include&gt;</code>标签配合使用，它可以减少布局的层级，而<code>&lt;ViewStub&gt;</code>提供了按需加载的功能，当需要使用时再加载布局到内存，这可以提高应用程序的初始化效率。但ViewStub也不是万能的，下面总结下ViewStub能做的事儿和什么时候该用ViewStub，什么时候该用View可见性的控制。</p>
+<p>首先来说说ViewStub的一些特点：</p>
+<p>1、ViewStub只能Inflate一次，之后ViewStub对象会被置为空。按句话说，某个被ViewStub指定的布局被Inflate后，就不会够再通过ViewStub来控制它了。<br>2、ViewStub只能用来Inflate一个布局文件，而不是某个具体的View，当然也可以把View写在某个布局文件中。</p>
+<p>基于以上的特点，那么可以考虑使用ViewStub的情况有：</p>
+<p>1、在程序的运行期间，某个布局在Inflate后，就不会有变化，除非重新启动。</p>
+<p>因为ViewStub只能Inflate一次，之后会被置空，所以无法指望后面接着使用ViewStub来控制布局。所以当需要在运行时不止一次的显示和隐藏某个布局，那么ViewStub是做不到的。这时就只能使用View的可见性来控制了。</p>
+<p>2、想要控制显示与隐藏的是一个布局文件，而非某个View。<br>因为设置给ViewStub的只能是某个布局文件的Id，所以无法让它来控制某个View。<br>所以，如果想要控制某个View(如Button或TextView)的显示与隐藏，或者想要在运行时不断的显示与隐藏某个布局或View，只能使用View的可见性来控制。</p>
+<h2 id="II-绘制优化"><a href="#II-绘制优化" class="headerlink" title="II.绘制优化"></a>II.绘制优化</h2><pre><code>绘制优化指的是避免在View的onDraw方法中执行大量的操作。主要体现在两个方面：
+</code></pre><p>①在onDraw方法中不要创建新的对象，因为onDraw方法会频繁调用，这会产生 大量的临时对象，不仅占用内存高而且可能导致频繁的gc而影响程序的执行效率。<br>②避免在onDraw方法中执行耗时操作或者成千上万的循环操作，大量的循环会抢占cpu时间片，这将导致View的绘制出现卡顿现象，根据Google官方给出的性能优化典范中的标准，view的绘制帧率保证60fps是最佳，这就要求每帧的绘制时间为16ms(16=1000/60)，虽然程序很难做到这点，但是降低onDraw方法的复杂度确是切实有效的。</p>
+<h2 id="III-内存泄漏优化"><a href="#III-内存泄漏优化" class="headerlink" title="III.内存泄漏优化"></a>III.内存泄漏优化</h2><p>内存泄漏在开发中是需要重视的一个问题，但是内存泄漏问题对开发人员的经验和开发意识有较高的要求。内存泄漏优化主要分为两个方面：<br>①避免写出内存泄漏的代码；<br>②通过一些分析工具如MAT来找出内存泄漏的代码继而解决；</p>
+<h2 id="IV-响应速度优化和ANR日志分析"><a href="#IV-响应速度优化和ANR日志分析" class="headerlink" title="IV.响应速度优化和ANR日志分析"></a>IV.响应速度优化和ANR日志分析</h2><p>响应速度优化的核心思想是避免在主线程中做耗时操作，但是有时候确实有很多耗时操作，可以考虑放到子线程中执行，就是采用异步的方式去处理耗时操作。响应速度过慢更多的体现在Activity的启动上，如果在主线程中做过多的操作，可能会导致Activity启动过程出现黑屏，甚至出现ANR异常。Android规定activity5秒内不能响应输入事件就会出现ANR，而BroadcastReceiver 10 秒内还没执行完操作也会出现ANR异常。ANR异常很难再代码中发现，如何定位？当出现ANR异常时，系统会在data/anr目录下创建一个trace.txt文件，通过分析这个文件来定位分析ANR的原因。</p>
+<h2 id="V-ListView和Bitmap优化"><a href="#V-ListView和Bitmap优化" class="headerlink" title="V. ListView和Bitmap优化"></a>V. ListView和Bitmap优化</h2><p> ListView主要分三个方面：<br>①采用ViewHolder并避免在getView方法中做耗时操作；<br>②要根据列表的滑动状态来控制任务的执行频率，比如当列表快速滑动是显然不适合开启大量的异步任务；<br>③尝试开启硬件加速来优化来是ListView的滑动更加顺畅。</p>
+<h2 id="VI-线程优化"><a href="#VI-线程优化" class="headerlink" title="VI.线程优化"></a>VI.线程优化</h2><p> 线程优化的核心思想是使用线程池，避免程序中存在大量的线程，通过线程池可以重用线程，减少由于线程的创建销毁带来的系统消耗，同时线程池也可以有效地控制线程池中最大的并发数，避免大量线程因互相抢占系统资源而导致阻塞。</p>
+<h2 id="VII-一些性能优化建议"><a href="#VII-一些性能优化建议" class="headerlink" title="VII. 一些性能优化建议"></a>VII. 一些性能优化建议</h2><p>  ①避免过多的创建兑现；<br>  ②不要过多使用枚举，枚举占用的内存比整形大；<br>  ③常量请使用 static final 来修饰；<br>  ④使用一些Android特有的数据结构，如SparesArray和Pair等，他们都具有更好的性能；<br>  ⑤适当使用软引用和弱引用；<br>  ⑥采用内存缓存和磁盘缓存；<br>  ⑦尽量采用静态内部类，这样可以避免潜在的由于内部类引起的内存泄漏。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+<div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="Jdqm wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注Jdqm Blog公众号，第一时间接收原创技术沉淀干货。</div>
+</div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="/uploads/wechat-reward.png" alt="Jdqm WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+      <strong>本文作者：</strong>
+      Jdqm
+    </li>
+    <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://www.shengyang.me/2017/03/31/Android性能优化方法/" title="Android性能优化方法">http://www.shengyang.me/2017/03/31/Android性能优化方法/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong>
+      本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/性能优化/" rel="tag"># 性能优化</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/31/Linux用户组、文件权限详解/" rel="next" title="Linux用户组、文件权限详解">
+                <i class="fa fa-chevron-left"></i> Linux用户组、文件权限详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/06/清明一过，就是第二季度了/" rel="prev" title="清明一过，就是第二季度了">
+                清明一过，就是第二季度了 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.gif"
+               alt="Jdqm" />
+          <p class="site-author-name" itemprop="name">Jdqm</p>
+           
+              <p class="site-description motion-element" itemprop="description">记录平凡的脚步</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jdqm/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/your-user-name" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/your-user-name" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/your-user-name" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Q：为什么要进行性能优化？"><span class="nav-number">1.</span> <span class="nav-text">Q：为什么要进行性能优化？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#I-布局优化"><span class="nav-number">2.</span> <span class="nav-text">I.  布局优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#II-绘制优化"><span class="nav-number">3.</span> <span class="nav-text">II.绘制优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#III-内存泄漏优化"><span class="nav-number">4.</span> <span class="nav-text">III.内存泄漏优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IV-响应速度优化和ANR日志分析"><span class="nav-number">5.</span> <span class="nav-text">IV.响应速度优化和ANR日志分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#V-ListView和Bitmap优化"><span class="nav-number">6.</span> <span class="nav-text">V. ListView和Bitmap优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VI-线程优化"><span class="nav-number">7.</span> <span class="nav-text">VI.线程优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VII-一些性能优化建议"><span class="nav-number">8.</span> <span class="nav-text">VII. 一些性能优化建议</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+    <span class="site-pv">
+      您是本站的
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      位访客
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "cb258acbb1a64f0ea27ef53858fcea2a",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+<!-- 背景动画 -->
+<script type="text/javascript" src="/js/src/particle.js"></script>
+</html>

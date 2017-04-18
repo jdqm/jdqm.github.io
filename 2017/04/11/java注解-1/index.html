@@ -1,0 +1,988 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java注解,元注解," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="1、Java提供的5个基本Annotation
+@Override用于限定重写父类方法，在编译时检查父类是否包含被重写的方法。主要帮助程序员避免一些低级错误。只能修饰方法（修饰范围将在后面的元注解中解释）。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java注解(1)">
+<meta property="og:url" content="http://www.shengyang.me/2017/04/11/java注解-1/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="1、Java提供的5个基本Annotation
+@Override用于限定重写父类方法，在编译时检查父类是否包含被重写的方法。主要帮助程序员避免一些低级错误。只能修饰方法（修饰范围将在后面的元注解中解释）。">
+<meta property="og:image" content="https://raw.githubusercontent.com/jdqm/hello-world/master/annotation/1.png">
+<meta property="og:updated_time" content="2017-04-11T08:18:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java注解(1)">
+<meta name="twitter:description" content="1、Java提供的5个基本Annotation
+@Override用于限定重写父类方法，在编译时检查父类是否包含被重写的方法。主要帮助程序员避免一些低级错误。只能修饰方法（修饰范围将在后面的元注解中解释）。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jdqm/hello-world/master/annotation/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":5,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.shengyang.me/2017/04/11/java注解-1/"/>
+
+
+
+
+
+  <title> java注解(1) | Jdqm Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jdqm Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">个人博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.shengyang.me/2017/04/11/java注解-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                java注解(1)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-11T16:18:53+08:00">
+                2017-04-11
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-04-11T16:18:53+08:00">
+                2017-04-11
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/04/11/java注解-1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-eye"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="1、Java提供的5个基本Annotation"><a href="#1、Java提供的5个基本Annotation" class="headerlink" title="1、Java提供的5个基本Annotation"></a>1、Java提供的5个基本Annotation</h2><ul>
+<li>@Override<br>用于限定重写父类方法，在编译时检查父类是否包含被重写的方法。主要帮助程序员避免一些低级错误。只能修饰方法（修饰范围将在后面的元注解中解释）。<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public class Fruit &#123;</div><div class="line">	</div><div class="line">	public void info()&#123;</div><div class="line">		System.out.println(&quot;水果的Info方法...&quot;);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">class Apple extends Fruit&#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public void info() &#123;</div><div class="line">		System.out.println(&quot;重写水果的Info方法...&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>上面的例子Apple类继承了Fruit类并重写了Fruit中的info()方法，其中@Override是可选的，可以不写。写上的好处有两个:<br>①告诉阅读代码的人这个方法是重写父类的方法；<br>②避免开发人员本想重写父类方法，确因拼写错误而导致错误，例如info()写成inf0(),这种错误后期也是很难发现的。</p>
+<ul>
+<li>@Deprecated<br>用于表示某个程序元素已过时，不推荐使用，后续迭代版本有可能去掉元素，当其他程序使用已过时的类、方法时编译器就会发出警告。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/jdqm/hello-world/master/annotation/1.png" alt="方法过时eclipse提示效果截图"></p>
+<p>上面的例子Apple类的info()方法使用@Deprecated标记，在使用时eclipse会将方法名加上中划线告诉开发人员此方法已过时。细心的读者肯定会注意到在文档注释中也有一个@deprecated，它们的作用基本相同，但是前者是jdk5才支持的注解，例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">class Apple extends Fruit&#123;</div><div class="line">	</div><div class="line">	/**</div><div class="line">	 * @deprecated 此方法以过时, 由 Apple.info2() 替代</div><div class="line">	 */</div><div class="line">	@Deprecated</div><div class="line">	@Override</div><div class="line">	public void info() &#123;</div><div class="line">		System.out.println(&quot;重写水果的Info方法...&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public void info2() &#123;</div><div class="line">		System.out.println(&quot;苹果的Info方法...&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以理解为 @deprecated 是给javac.exe生成文档使用的，而 @Deprecate 则不是。</p>
+<ul>
+<li>@SuppressWarnings<br>抑制警告，如下代码myList没有声明泛型，会有警告，使用@SuppressWarnings(“rawtypes”)这个注解后警告就不再提示了。<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">@SuppressWarnings(&quot;rawtypes&quot;)</div><div class="line">public class SupressWarningsTest &#123;</div><div class="line">	</div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		List myList = new ArrayList&lt;&gt;();</div><div class="line">		System.out.println(myList);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>这个注解个人不推荐使用，警告本身说明程序可能会存在风险，尽量通过实际手段消除警告。</p>
+<ul>
+<li>@SafeVarags（Java7新增）</li>
+</ul>
+<p>先看一个例子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">//不使用泛型</div><div class="line">List list = new ArrayList&lt;Integer&gt;();</div><div class="line">		</div><div class="line">//添加新元素引发 unchecked 异常 </div><div class="line">list.add(20);</div><div class="line">		</div><div class="line">//下面代码引起“未经检查的转换”的警告，编译、运行时完全正常，</div><div class="line">List&lt;String&gt; ls = list; //①</div><div class="line">		</div><div class="line">//但是访问ls里的元素，如下面的代码就会引起运行时异常 java.lang.ClassCastException</div><div class="line">System.out.println(ls.get(0));</div></pre></td></tr></table></figure></p>
+<p>Java把引发这种错误的原因称为“堆污染”（heap pollution），当把一个不带泛型的的对象赋值给一个带泛型的变量时，往往就会发生这种“堆污染”，如上面带①的行。</p>
+<p>例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@SafeVarargs // 不是真的安全</div><div class="line">static void m(List&lt;String&gt;... stringLists) &#123;</div><div class="line">	Object[] array = stringLists;</div><div class="line">	List&lt;Integer&gt; tmpList = Arrays.asList(42);</div><div class="line">	array[0] = tmpList; // 语义是无效的, 但编译器无警告</div><div class="line">	String s = stringLists[0].get(0); // Oh no, ClassCastException at runtime!</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<ul>
+<li>@FunctionalInterface（Java8新增）</li>
+</ul>
+<p>Java8中规定，只有一个抽象方法的接口（可以有其他的方法，但是抽象方法只有一个），称为函数式接口。@FunctionalInterface就是指定某个接口必须是函数式接口。函数式接口就是为Java8 中的Lamda表达式准备的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">@FunctionalInterface</div><div class="line">public interface FunInterface &#123;</div><div class="line">	</div><div class="line">	static void foo()&#123;</div><div class="line">		System.out.println(&quot;foo&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	default void bar()&#123;</div><div class="line">		System.out.println(&quot;bar&quot;);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	//这个接口中唯一的抽象方法</div><div class="line">	void test();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="2、JDK的元注解"><a href="#2、JDK的元注解" class="headerlink" title="2、JDK的元注解"></a>2、JDK的元注解</h2><p>一般地，称修饰数据的数据为元数据，自然元注解是用来修饰注解的。</p>
+<ul>
+<li>@Retation<br>该注解只能用来修饰Annotation的定义，用于指定被修饰的Annotation可以保留多长时间。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">取值</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">RetentionPolicy.SOURCE</td>
+<td style="text-align:left">只保留在源码中，编译器直接丢弃这种类型的注解</td>
+</tr>
+<tr>
+<td style="text-align:left">RetentionPolicy.CLASS</td>
+<td style="text-align:left">编译器把这类注解保留在class字节码文件中，当运行Java程序时，JVM不可获取这类注解信息，这个默认值</td>
+</tr>
+<tr>
+<td style="text-align:left">RetentionPolicy.RUNTIME</td>
+<td style="text-align:left">编译器把这类注解保留在class字节码文件中，当运行Java程序时，JVM可以获取这类注解信息，程序可以通过反射获取这类注解的信息</td>
+</tr>
+</tbody>
+</table>
+<p>如果需要通过反射获取注解的信息，需要value属性的值为RetentionPolicy.RUNTIME的@Retation修饰的注解，可以采用如下代码为value赋值。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">@Retention(value=RetentionPolicy.RUNTIME)</div></pre></td></tr></table></figure></p>
+<p>或者<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">@Retention(RetentionPolicy.RUNTIME)</div></pre></td></tr></table></figure></p>
+<ul>
+<li>@Target<br>该注解也只能修饰Annotation的定义，用于指定被修饰的Annotation能修饰哪些程序单元，@Target也包含一个名为value的成员变量，该变量的取值只能是如下几个。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">取值</th>
+<th style="text-align:left">可修饰单元类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">ElementType.TYPE</td>
+<td style="text-align:left">类, 接口 (包括注解类型), 或者枚举定义</td>
+</tr>
+<tr>
+<td style="text-align:left">ElementType.FIELD</td>
+<td style="text-align:left">成员变量 (包括枚举常量)</td>
+</tr>
+<tr>
+<td style="text-align:left">ElementType.METHOD</td>
+<td style="text-align:left">方法</td>
+</tr>
+<tr>
+<td style="text-align:left">ElementType.PARAMETER</td>
+<td style="text-align:left">参数</td>
+</tr>
+<tr>
+<td style="text-align:left">ElementType.CONSTRUCTOR</td>
+<td style="text-align:left">构造函数</td>
+</tr>
+<tr>
+<td style="text-align:left">ElementType.LOCAL_VARIABLE</td>
+<td style="text-align:left">局部变量</td>
+</tr>
+<tr>
+<td style="text-align:left">ElementType.ANNOTATION_TYPE</td>
+<td style="text-align:left">注解类型</td>
+</tr>
+<tr>
+<td style="text-align:left">ElementType.PACKAGE</td>
+<td style="text-align:left">包</td>
+</tr>
+<tr>
+<td style="text-align:left">ElementType.TYPE_PARAMETER</td>
+<td style="text-align:left">参数类型, since 1.8</td>
+</tr>
+<tr>
+<td style="text-align:left">ElementType.TYPE_USE</td>
+<td style="text-align:left">Use of a type， since 1.8</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>@Documented</li>
+</ul>
+<p>如果使用了@Documented修饰的注解，该注解会被javac工具提取成文档，API文档中将包含该注解的说明。</p>
+<ul>
+<li>@Inherited<br>使用@Inherited修饰的注解具有继承性。举一个例子</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">@Target(ElementType.TYPE)</div><div class="line">@Retention(RetentionPolicy.RUNTIME)</div><div class="line">@Inherited</div><div class="line">public @interface Inheritable &#123;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">//使用 @Inheritable修饰的基类</div><div class="line">@Inheritable</div><div class="line">class Base&#123;</div><div class="line">	</div><div class="line">&#125;</div><div class="line"></div><div class="line">//InheritableTest,只是继承了Base类，并未直接使用@Inheritable这个注解修饰</div><div class="line">public class InheritableTest extends Base&#123;</div><div class="line">	</div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		</div><div class="line">		boolean result = InheritableTest.class.isAnnotationPresent(Inheritable.class);</div><div class="line">		//打印InheritableTest这个类是否有@Inheritable修饰</div><div class="line">		System.out.println(result);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面的例子结果为 true，InheritableTest通过继承Base类，把Base上的注解@Inheritable也继承了。今天到此为止，下一篇将介绍自定义注解和注解处理器。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+<div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="Jdqm wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注Jdqm Blog公众号，第一时间接收原创技术沉淀干货。</div>
+</div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="/uploads/wechat-reward.png" alt="Jdqm WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+      <strong>本文作者：</strong>
+      Jdqm
+    </li>
+    <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://www.shengyang.me/2017/04/11/java注解-1/" title="java注解(1)">http://www.shengyang.me/2017/04/11/java注解-1/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong>
+      本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java注解/" rel="tag"># Java注解</a>
+          
+            <a href="/tags/元注解/" rel="tag"># 元注解</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/10/Android开发常用开源框架/" rel="next" title="Android开发常用开源框架">
+                <i class="fa fa-chevron-left"></i> Android开发常用开源框架
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/12/注解-2-自定义注解、注解处理器/" rel="prev" title="java注解(2)-自定义注解、注解处理器">
+                java注解(2)-自定义注解、注解处理器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.gif"
+               alt="Jdqm" />
+          <p class="site-author-name" itemprop="name">Jdqm</p>
+           
+              <p class="site-description motion-element" itemprop="description">记录平凡的脚步</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jdqm/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/your-user-name" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/your-user-name" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/your-user-name" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、Java提供的5个基本Annotation"><span class="nav-number">1.</span> <span class="nav-text">1、Java提供的5个基本Annotation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、JDK的元注解"><span class="nav-number">2.</span> <span class="nav-text">2、JDK的元注解</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+    <span class="site-pv">
+      您是本站的
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      位访客
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "cb258acbb1a64f0ea27ef53858fcea2a",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+<!-- 背景动画 -->
+<script type="text/javascript" src="/js/src/particle.js"></script>
+</html>

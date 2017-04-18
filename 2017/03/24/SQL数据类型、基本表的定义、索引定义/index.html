@@ -1,0 +1,1112 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="-SQL -数据库 -database," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="前言由于最近做消息中心后台开发，需要进行数据库的操作，在编写SQL（mybatis）上略感吃力，于是复习一下大学时代所学习的数据库的相关基础知识，直接从SQL开始。
+I.SQL与模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SQL数据类型、基本表的定义、索引定义">
+<meta property="og:url" content="http://www.shengyang.me/2017/03/24/SQL数据类型、基本表的定义、索引定义/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="前言由于最近做消息中心后台开发，需要进行数据库的操作，在编写SQL（mybatis）上略感吃力，于是复习一下大学时代所学习的数据库的相关基础知识，直接从SQL开始。
+I.SQL与模式">
+<meta property="og:image" content="https://raw.githubusercontent.com/jdqm/hello-world/master/db/Image.png">
+<meta property="og:updated_time" content="2017-04-06T10:49:01.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SQL数据类型、基本表的定义、索引定义">
+<meta name="twitter:description" content="前言由于最近做消息中心后台开发，需要进行数据库的操作，在编写SQL（mybatis）上略感吃力，于是复习一下大学时代所学习的数据库的相关基础知识，直接从SQL开始。
+I.SQL与模式">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jdqm/hello-world/master/db/Image.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":5,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.shengyang.me/2017/03/24/SQL数据类型、基本表的定义、索引定义/"/>
+
+
+
+
+
+  <title> SQL数据类型、基本表的定义、索引定义 | Jdqm Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jdqm Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">个人博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.shengyang.me/2017/03/24/SQL数据类型、基本表的定义、索引定义/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                SQL数据类型、基本表的定义、索引定义
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-24T10:07:53+08:00">
+                2017-03-24
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-04-06T18:49:01+08:00">
+                2017-04-06
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/database/" itemprop="url" rel="index">
+                    <span itemprop="name">database</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/24/SQL数据类型、基本表的定义、索引定义/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-eye"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>由于最近做消息中心后台开发，需要进行数据库的操作，在编写SQL（mybatis）上略感吃力，于是复习一下大学时代所学习的数据库的相关基础知识，直接从SQL开始。</p>
+<h3 id="I-SQL与模式"><a href="#I-SQL与模式" class="headerlink" title="I.SQL与模式"></a>I.SQL与模式</h3><p><img src="https://raw.githubusercontent.com/jdqm/hello-world/master/db/Image.png" alt="此处输入图片的描述"></p>
+ <a id="more"></a>
+<h3 id="II-本次学习所用到的几个表"><a href="#II-本次学习所用到的几个表" class="headerlink" title="II.本次学习所用到的几个表"></a>II.本次学习所用到的几个表</h3><p>Student</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">学号 Sno</th>
+<th style="text-align:center">姓名 Sname</th>
+<th style="text-align:center">性别 Ssex</th>
+<th style="text-align:center">年龄 Sage</th>
+<th style="text-align:center">所在系 Sdept</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">20021521</td>
+<td style="text-align:center">李勇</td>
+<td style="text-align:center">男</td>
+<td style="text-align:center">20</td>
+<td style="text-align:center">CS</td>
+</tr>
+<tr>
+<td style="text-align:center">20021522</td>
+<td style="text-align:center">刘晨</td>
+<td style="text-align:center">女</td>
+<td style="text-align:center">19</td>
+<td style="text-align:center">CS</td>
+</tr>
+<tr>
+<td style="text-align:center">20021523</td>
+<td style="text-align:center">王敏</td>
+<td style="text-align:center">女</td>
+<td style="text-align:center">18</td>
+<td style="text-align:center">MA</td>
+</tr>
+<tr>
+<td style="text-align:center">20021524</td>
+<td style="text-align:center">张力</td>
+<td style="text-align:center">男</td>
+<td style="text-align:center">19</td>
+<td style="text-align:center">IS</td>
+</tr>
+</tbody>
+</table>
+<p>Course</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">课程号 Cno</th>
+<th style="text-align:center">课程名 Cname</th>
+<th style="text-align:center">先行课 Cpno</th>
+<th style="text-align:center">学分 Sage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">数据库</td>
+<td style="text-align:center">5</td>
+<td style="text-align:center">4</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">数学</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">2</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">信息系统</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">4</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center">操作系统</td>
+<td style="text-align:center">6</td>
+<td style="text-align:center">3</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center">数据结构</td>
+<td style="text-align:center">7</td>
+<td style="text-align:center">4</td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:center">数据处理</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">2</td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:center">PASCAL语言</td>
+<td style="text-align:center">6</td>
+<td style="text-align:center">4</td>
+</tr>
+</tbody>
+</table>
+<p>CS</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">学号 Sno</th>
+<th style="text-align:center">课程号 Cno</th>
+<th style="text-align:center">成绩 Grade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">20021521</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">92</td>
+</tr>
+<tr>
+<td style="text-align:center">20021521</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">85</td>
+</tr>
+<tr>
+<td style="text-align:center">20021521</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">88</td>
+</tr>
+<tr>
+<td style="text-align:center">20021522</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">90</td>
+</tr>
+<tr>
+<td style="text-align:center">20021522</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">80</td>
+</tr>
+</tbody>
+</table>
+<h3 id="III-SQL的数据定义语句"><a href="#III-SQL的数据定义语句" class="headerlink" title="III.SQL的数据定义语句"></a>III.SQL的数据定义语句</h3><table>
+<thead>
+<tr>
+<th style="text-align:center">操作对象</th>
+<th style="text-align:center">创建</th>
+<th style="text-align:center">删除</th>
+<th style="text-align:center">修改</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">模式</td>
+<td style="text-align:center">create schema</td>
+<td style="text-align:center">drop schema</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">表</td>
+<td style="text-align:center">create table</td>
+<td style="text-align:center">drop table</td>
+<td style="text-align:center">alter table</td>
+</tr>
+<tr>
+<td style="text-align:center">视图</td>
+<td style="text-align:center">create view</td>
+<td style="text-align:center">drop view</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">索引</td>
+<td style="text-align:center">create index</td>
+<td style="text-align:center">drop index</td>
+</tr>
+</tbody>
+</table>
+<h3 id="IV-创建表"><a href="#IV-创建表" class="headerlink" title="IV.创建表"></a>IV.创建表</h3><p>一般格式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">create table &lt;表名&gt; (&lt;列名&gt; &lt;数据类型&gt; [列级完整性约束]</div><div class="line">    [ , &lt;列名&gt; &lt;数据类型&gt; [列级完整性约束]]</div><div class="line">    ...</div><div class="line">    [,&lt;表级完整性约束&gt;] );</div></pre></td></tr></table></figure></p>
+<p>例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">create table Student(</div><div class="line">    Sno char(9) primary key,  /*列级完整性约束， Sno为主码*/</div><div class="line">    Sname char(20) unique,   /*列级完整性约束， Sname唯一*/</div><div class="line">    Ssex char(2),</div><div class="line">    Sage smallint,</div><div class="line">    Sdept char(20)</div><div class="line">);</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">create table Course(</div><div class="line">    Cno char(4) Primary key,  /*列级完整性约束， Cno为主码*/</div><div class="line">    Cname char(40),</div><div class="line">    Cpno char(4),                  /*Cpno是先行课*/</div><div class="line">    Ccredit smallint,</div><div class="line">    foreign key (Cpno) references Course(Cno)  /*表级完整性约束，Cpno 是外码，被参考Course,被参照Cno*/</div><div class="line"></div><div class="line">);</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">create table SC(</div><div class="line">    Sno char(9),</div><div class="line">    Cno char(4),</div><div class="line">    Grade smallint,</div><div class="line">    primary key (Sno, Cno),   /* 主码有两个属性构成，必须作为表级完整性约束进行定义*/</div><div class="line">    foreign key (Sno) references Student(Sno),  /*表级完整性约束，Sno 是外码，被参考Student,被参照Sno*/</div><div class="line">    foreign key (Cno) references Course(Cno)   /*表级完整性约束，Cpno 是外码，被参考Course,被参照Cno*/</div><div class="line">);</div></pre></td></tr></table></figure>
+<h3 id="V-关于数据类型"><a href="#V-关于数据类型" class="headerlink" title="V.关于数据类型"></a>V.关于数据类型</h3><p>各个数据库的数据类型不完全相同，选择数据类型的原则有两个，一个是取值范围，二是要做哪些数据运算。比如年龄：取值为100左右的正整数，取值范围很多数据类型都满足，比如char(3)、长整形、短整型；运算比如需要求平均年龄，这个只有长整形和短整型支持，考虑到存储空间的占用，故选用短整型。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">数据类型</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">char(n)</td>
+<td style="text-align:center">长度为n的定长字符串</td>
+</tr>
+<tr>
+<td style="text-align:center">varchar(n)</td>
+<td style="text-align:center">最大长度为n的变长字符串</td>
+</tr>
+<tr>
+<td style="text-align:center">int</td>
+<td style="text-align:center">长整数，也可以写成integer</td>
+</tr>
+<tr>
+<td style="text-align:center">smallint</td>
+<td style="text-align:center">短整数</td>
+</tr>
+<tr>
+<td style="text-align:center">numeric(p,d)</td>
+<td style="text-align:center">定点数，由p位数字（不包含小数点、符号）组成，小数点后面有d为数字</td>
+</tr>
+<tr>
+<td style="text-align:center">real</td>
+<td style="text-align:center">取决于机器精度的浮点数</td>
+</tr>
+<tr>
+<td style="text-align:center">double precision</td>
+<td style="text-align:center">取决于机器精度的双精度浮点数</td>
+</tr>
+<tr>
+<td style="text-align:center">float(n)</td>
+<td style="text-align:center">浮点数，精度至少为n位数字</td>
+</tr>
+<tr>
+<td style="text-align:center">date</td>
+<td style="text-align:center">日期，包含年、月、日，格式为 YYYY-MM-DD</td>
+</tr>
+<tr>
+<td style="text-align:center">time</td>
+<td style="text-align:center">时间，包含一日的时、分、秒，格式为 HH:MM-SS</td>
+</tr>
+</tbody>
+</table>
+<p>更多数据类型请参考具体的数据库厂商说明书。</p>
+<h3 id="VI-修改基本表"><a href="#VI-修改基本表" class="headerlink" title="VI.修改基本表"></a>VI.修改基本表</h3><p>一般格式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">alter table &lt;表名&gt; </div><div class="line">    [add &lt;列名&gt; &lt;数据类型&gt; [完整性约束]]</div><div class="line">    [drop &lt;完整性约束 名&gt;]</div><div class="line">    [alter column&lt;列名&gt; &lt;数据类型&gt;];</div></pre></td></tr></table></figure></p>
+<p>例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">alter table Student add S_ontrance date;  /*学生表增加入学时间列*/</div><div class="line"></div><div class="line">alter table Student alter column Sage int; /*修改学生表的Sage列的数据类型为int，这个在mysql中执行错误*/</div><div class="line"></div><div class="line">alter table Course add unique(Cname); /*增加课程名唯一的约束*/</div></pre></td></tr></table></figure></p>
+<h3 id="VII-删除表"><a href="#VII-删除表" class="headerlink" title="VII.删除表"></a>VII.删除表</h3><p>一般格式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">drop table &lt;表名&gt; [restrict | cascade]</div></pre></td></tr></table></figure></p>
+<p>restrict：删除表示有限制的，如果该表有外键、视图、触发器、存储过程、函数等约束，则删除失败，缺省为restrict</p>
+<p>cascade: 删除没有条件，删除该表时，相关联的对象，视图等都会被删除，使用值需谨慎；不同的数据库厂商对的实现细节还是有差距的，比如mysql如果该表有外键的话即使指定cascade也是无法删除的。</p>
+<p>比如：在mysq下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">drop table Student restrict;</div></pre></td></tr></table></figure></p>
+<p>提示错误信息：<br>[SQL] drop table Student restrict ;<br>[Err] 1451 - Cannot delete or update a parent row: a foreign key constraint fails</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">drop table Student cascade;</div></pre></td></tr></table></figure>
+<p>[SQL] drop table Student cascade;<br>[Err] 1451 - Cannot delete or update a parent row: a foreign key constraint fails</p>
+<p>验证一个表只有视图的情况下：restrict和cascade的差别：首先给SC表创建一个视图，然后删除该表，SC表无其他关联约束：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">create view v_sc as select * from SC;</div><div class="line">drop table SC restrict;</div><div class="line">drop table SC cascade;</div></pre></td></tr></table></figure></p>
+<p>可以看到在mysql的实现下restrict，cascade 都可以删除表，但是视图没有删除，在这一点上表现是一致的。</p>
+<h3 id="VIII-建立索引"><a href="#VIII-建立索引" class="headerlink" title="VIII.建立索引"></a>VIII.建立索引</h3><p>建立索引是加快查询的有效手段。</p>
+<p>一般格式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">create [unique] [cluster] index &lt;索引名称&gt; on &lt;表名&gt;(&lt;列名&gt;[&lt;次序&gt;] [,&lt;列名&gt;[&lt;次序&gt;]]...);</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">/**建立索引*/</div><div class="line">create unique index StuNoIndex on Student(Sno);</div></pre></td></tr></table></figure>
+<h3 id="IX-删除索引"><a href="#IX-删除索引" class="headerlink" title="IX.删除索引"></a>IX.删除索引</h3><p>一般格式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">drop index&lt;索引名称&gt; on &lt;表名&gt;</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">drop index StuNoIndex on Student;</div></pre></td></tr></table></figure>
+<p>索引一旦建立，由系统使用并维护，不需用户干预。建立索引是为了减少查询时间，如果数据频繁增删改，系统会花费许多时间来维护索引，从而减低了数据库系统的效率，这个时候可以删除一些不必要的索引。在RDBMS中一般采用B+树、HASH索引来实现，B+树具有动态平衡的优点，Hash索引则具有查找快速的优点。索引是数据库的内部实现技术，属于内模式范畴。至于某一索引在创建时是采用B+树还是Hash索引则由具体的RDBMS来决定。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+<div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="Jdqm wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注Jdqm Blog公众号，第一时间接收原创技术沉淀干货。</div>
+</div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="/uploads/wechat-reward.png" alt="Jdqm WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+      <strong>本文作者：</strong>
+      Jdqm
+    </li>
+    <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://www.shengyang.me/2017/03/24/SQL数据类型、基本表的定义、索引定义/" title="SQL数据类型、基本表的定义、索引定义">http://www.shengyang.me/2017/03/24/SQL数据类型、基本表的定义、索引定义/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong>
+      本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SQL-数据库-database/" rel="tag"># -SQL -数据库 -database</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/20/Handler消息机制/" rel="next" title="Handler消息机制">
+                <i class="fa fa-chevron-left"></i> Handler消息机制
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/24/SQL单表查询/" rel="prev" title="SQL单表查询">
+                SQL单表查询 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.gif"
+               alt="Jdqm" />
+          <p class="site-author-name" itemprop="name">Jdqm</p>
+           
+              <p class="site-description motion-element" itemprop="description">记录平凡的脚步</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jdqm/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/your-user-name" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/your-user-name" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/your-user-name" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#I-SQL与模式"><span class="nav-number">2.</span> <span class="nav-text">I.SQL与模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#II-本次学习所用到的几个表"><span class="nav-number">3.</span> <span class="nav-text">II.本次学习所用到的几个表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#III-SQL的数据定义语句"><span class="nav-number">4.</span> <span class="nav-text">III.SQL的数据定义语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IV-创建表"><span class="nav-number">5.</span> <span class="nav-text">IV.创建表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#V-关于数据类型"><span class="nav-number">6.</span> <span class="nav-text">V.关于数据类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VI-修改基本表"><span class="nav-number">7.</span> <span class="nav-text">VI.修改基本表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VII-删除表"><span class="nav-number">8.</span> <span class="nav-text">VII.删除表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VIII-建立索引"><span class="nav-number">9.</span> <span class="nav-text">VIII.建立索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IX-删除索引"><span class="nav-number">10.</span> <span class="nav-text">IX.删除索引</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+    <span class="site-pv">
+      您是本站的
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      位访客
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "cb258acbb1a64f0ea27ef53858fcea2a",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+<!-- 背景动画 -->
+<script type="text/javascript" src="/js/src/particle.js"></script>
+</html>

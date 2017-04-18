@@ -1,0 +1,924 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android,Thread,ThreadPool," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="I. 线程线程在Android系统中扮演者一个很重要的角色，从用途上来说，可以分为主线程和子线程，主线程一般用来处理界面与用户的交互，而子线程则往往用来执行一些耗时操作，例如I/O操作和网络访问，在Android3.0之后网络访问必须放到子线程中执行，否则会抛异常（NetworkOnMainThreadException），这样做的目的也是为了防止用户在主线程中做耗时操作，这样很容易引起ANR。在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android的线程与线程池">
+<meta property="og:url" content="http://www.shengyang.me/2017/03/31/Android的线程与线程池/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="I. 线程线程在Android系统中扮演者一个很重要的角色，从用途上来说，可以分为主线程和子线程，主线程一般用来处理界面与用户的交互，而子线程则往往用来执行一些耗时操作，例如I/O操作和网络访问，在Android3.0之后网络访问必须放到子线程中执行，否则会抛异常（NetworkOnMainThreadException），这样做的目的也是为了防止用户在主线程中做耗时操作，这样很容易引起ANR。在">
+<meta property="og:image" content="https://raw.githubusercontent.com/jdqm/hello-world/master/thread/Image1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jdqm/hello-world/master/thread/Image2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jdqm/hello-world/master/thread/Image3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jdqm/hello-world/master/thread/Image4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jdqm/hello-world/master/thread/Image5.png">
+<meta property="og:updated_time" content="2017-03-31T14:44:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android的线程与线程池">
+<meta name="twitter:description" content="I. 线程线程在Android系统中扮演者一个很重要的角色，从用途上来说，可以分为主线程和子线程，主线程一般用来处理界面与用户的交互，而子线程则往往用来执行一些耗时操作，例如I/O操作和网络访问，在Android3.0之后网络访问必须放到子线程中执行，否则会抛异常（NetworkOnMainThreadException），这样做的目的也是为了防止用户在主线程中做耗时操作，这样很容易引起ANR。在">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jdqm/hello-world/master/thread/Image1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":5,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.shengyang.me/2017/03/31/Android的线程与线程池/"/>
+
+
+
+
+
+  <title> Android的线程与线程池 | Jdqm Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jdqm Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">个人博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://www.shengyang.me/2017/03/31/Android的线程与线程池/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Android的线程与线程池
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-31T11:33:17+08:00">
+                2017-03-31
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-03-31T22:44:29+08:00">
+                2017-03-31
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/03/31/Android的线程与线程池/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-eye"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="I-线程"><a href="#I-线程" class="headerlink" title="I. 线程"></a>I. 线程</h2><p>线程在Android系统中扮演者一个很重要的角色，从用途上来说，可以分为主线程和子线程，主线程一般用来处理界面与用户的交互，而子线程则往往用来执行一些耗时操作，例如I/O操作和网络访问，在Android3.0之后网络访问必须放到子线程中执行，否则会抛异常（NetworkOnMainThreadException），这样做的目的也是为了防止用户在主线程中做耗时操作，这样很容易引起ANR。在Android系统中还有一些扮演线程的角色：AsyncTask、IntentService和HandlerThread，虽然它们都有别于传统的线程，但是它们的本质仍然是传统的线程。</p>
+<a id="more"></a>
+<h2 id="II-线程池"><a href="#II-线程池" class="headerlink" title="II. 线程池"></a>II. 线程池</h2><p>线程是操作系统中最小的调度单位，操作系统创建、销毁线程的开销代价是比较大的，试想一下如果不断地创建销毁线程，那么系统就会频繁地创建销毁线程，同时创建太多的线程在CUP调度时切换调度单位也是一个问题，除非线程数量少于CUP的核数才能保证绝对的并行。频繁地创建销毁线程带来不小的系统开销，这个时候线程池就是明智的选择，一个线程池会缓存一定数量的线程，通过线程池来避免频繁的创建销毁线程所带来的系统开销。Android中的线程池来源于Java，主要通过executor来派生特定类型的线程池，不同种类的线程池有不同的特性。</p>
+<h2 id="III-AsyncTask"><a href="#III-AsyncTask" class="headerlink" title="III. AsyncTask"></a>III. AsyncTask</h2><p>AsyncTask是一个抽象泛型类，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">public abstract class AsyncTask&lt;Params, Progress, Result&gt;</div></pre></td></tr></table></figure></p>
+<p>这三个参数中的Params是执行异步任务传入的参数类型，Progress是异步任务需要向外发出的进度值得类型，即publishProgress方法的参数类型，Result是doInbackground方法的返回值类型。下面是一个例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">new MyAsyncTask(&quot;task1&quot;).execute(&quot;param1&quot;);</div><div class="line">new MyAsyncTask(&quot;task1&quot;).execute(&quot;param1&quot;, &quot;param2&quot;);</div><div class="line">new MyAsyncTask(&quot;task1&quot;).execute(&quot;param1&quot;, &quot;param2&quot;, &quot;param3&quot;);</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div></pre></td><td class="code"><pre><div class="line">class MyAsyncTask extends AsyncTask&lt;String, Integer, String&gt;&#123;</div><div class="line"></div><div class="line">    private String name;</div><div class="line"></div><div class="line">    public MyAsyncTask(String tag)&#123;</div><div class="line">        name = tag;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * 在主线程工作，一般在这个方法中提示正在加载某些资源</div><div class="line">     */</div><div class="line">    @Override</div><div class="line">    protected void onPreExecute() &#123;</div><div class="line">        super.onPreExecute();</div><div class="line">    &#125;</div><div class="line">    /**</div><div class="line">     * 在子线程工作(使用线程池)，在后台异步加载资源，可以通过publishProgress(Progress...         values)调用onProgressUpdate来更新进度</div><div class="line">     *</div><div class="line">     * @param params 这个参数是new MyAsyncTask().execute(params) 时传递的参数，其中 ... 表示参数是动态的,</div><div class="line">     *               接收的时候是一个数组</div><div class="line">     *</div><div class="line">     * @return 返回值会传递到onPostExecute方法的参数</div><div class="line">     */</div><div class="line">    @Override</div><div class="line">    protected String doInBackground(String... params) &#123;</div><div class="line">        //模拟耗时任务</div><div class="line">        SystemClock.sleep(2000);</div><div class="line">        Log.d(TAG, &quot;doInBackground: &quot; + name + &quot;:params.length=&quot; + params.length);</div><div class="line">        int progress = 10;</div><div class="line">        publishProgress(progress);</div><div class="line">        return name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * 在主线程工作，一般在这个方法根据参数去更新UI,例如消除掉正在加载的对话框，将结果刷新到界面</div><div class="line">     *</div><div class="line">     * @param s doInBackground的返回值</div><div class="line">     *</div><div class="line">     */</div><div class="line">    @Override</div><div class="line">    protected void onPostExecute(String s) &#123;</div><div class="line">        super.onPostExecute(s);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * 在主线程工作，用于更新进度，比如在下载的场景提示当前的下载进度</div><div class="line">     *</div><div class="line">     * @param values 在doInBackground中调用publishProgress(Progress... values)的参数</div><div class="line">     */</div><div class="line">    @Override</div><div class="line">    protected void onProgressUpdate(Integer... values) &#123;</div><div class="line">        //Log.d(TAG, &quot;onProgressUpdate: progress=&quot; + values[0]);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jdqm/hello-world/master/thread/Image1.png" alt="此处输入图片的描述"></p>
+<p>从打印结果可以看出任务时串行执行的，打印结果相差了2秒，我使用的模拟器版本是Android-22（5.1.1）。Android1.6之前的版本是串行的，1.6到Android3.0之间是并行的，3.0开始默认又变为串行的了，当然在3.0之后我们可以通过AsyncTask的 executeOnExecutor来实现并行。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">new MyAsyncTask(&quot;task1 on executor&quot;).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, &quot;&quot;);</div><div class="line">new MyAsyncTask(&quot;task2 on executor&quot;).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, &quot;&quot;);</div><div class="line">new MyAsyncTask(&quot;task3 on executor&quot;).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, &quot;&quot;);</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jdqm/hello-world/master/thread/Image2.png" alt="此处输入图片的描述"></p>
+<p>我们在代码中模拟通过SystemClock.sleep(2000)来模拟还是任务， 但是通过结果可以看到是在同一秒钟（46）打印的结果，这就意味着任务是并行处理的。</p>
+<h2 id="IV-HandlerThread"><a href="#IV-HandlerThread" class="headerlink" title="IV. HandlerThread"></a>IV. HandlerThread</h2><p>HandlerThread继承自Thread，其实也没做什么，最主要的工作是帮我们做了 Looper.prepare() 和Looper.loop()，然后HanlderThread可以直接使用Handler。下面是HandlerThread的run方法的实现：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public void run() &#123;</div><div class="line">    mTid = Process.myTid();</div><div class="line">    Looper.prepare();</div><div class="line">    synchronized (this) &#123;</div><div class="line">        mLooper = Looper.myLooper();</div><div class="line">        notifyAll();</div><div class="line">    &#125;</div><div class="line">    Process.setThreadPriority(mPriority);</div><div class="line">    onLooperPrepared();</div><div class="line">    Looper.loop();</div><div class="line">    mTid = -1;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>你可能会发现其中有一句代码<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">```</div><div class="line">/**</div><div class="line"> * This method returns the Looper associated with this thread. If this thread not been started</div><div class="line"> * or for any reason is isAlive() returns false, this method will return null. If this thread </div><div class="line"> * has been started, this method will block until the looper has been initialized. </div><div class="line">  * @return The looper.</div><div class="line"> */</div><div class="line">public Looper getLooper() &#123;</div><div class="line">    if (!isAlive()) &#123;</div><div class="line">        return null;</div><div class="line">    &#125;</div><div class="line">   </div><div class="line">    // If the thread has been started, wait until the looper has been created.</div><div class="line">    synchronized (this) &#123;</div><div class="line">        while (isAlive() &amp;&amp; mLooper == null) &#123;</div><div class="line">            try &#123;</div><div class="line">                wait();</div><div class="line">            &#125; catch (InterruptedException e) &#123;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return mLooper;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>你会发现里面有一个wait()，其实就是通知等待的代码，你可以执行了,这是一个同步机制。</p>
+<p>HandlerThread用法的一个例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">public class MainActivity extends AppCompatActivity &#123;</div><div class="line"></div><div class="line">    private static final String TAG = &quot;MainActivity&quot;;</div><div class="line"></div><div class="line">    private Handler mHandler;</div><div class="line">    private HandlerThread mThread;</div><div class="line">   </div><div class="line">     @Override</div><div class="line">    protected void onCreate(Bundle savedInstanceState) &#123;</div><div class="line">        super.onCreate(savedInstanceState);</div><div class="line">        setContentView(R.layout.activity_main);</div><div class="line"></div><div class="line">        mThread = new HandlerThread(&quot;#HandlerThread&quot;);</div><div class="line">        mThread.start();</div><div class="line">        mHandler = new Handler(mThread.getLooper())&#123;</div><div class="line">            @Override</div><div class="line">            public void handleMessage(Message msg) &#123;</div><div class="line">                super.handleMessage(msg);</div><div class="line">                Log.d(TAG, &quot;handleMessage: &quot; + msg.what);</div><div class="line">                mHandler.sendEmptyMessageDelayed(0, 1000);</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onResume() &#123;</div><div class="line">        super.onResume();</div><div class="line">        mHandler.sendEmptyMessageDelayed(0, 1000);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onPause() &#123;</div><div class="line">        super.onPause();</div><div class="line">        mHandler.removeMessages(0);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onDestroy() &#123;</div><div class="line">        mThread.quit();</div><div class="line">        super.onDestroy();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>由于HandlerTHread的run方法是无限循环，所以有必要去调用它的quit方法或者quitSafely方法去退出，这是一个良好的编程习惯。</p>
+<h2 id="V-IntentService"><a href="#V-IntentService" class="headerlink" title="V. IntentService"></a>V. IntentService</h2><p>IntentService是一种比较特殊的Service，它继承自Service，是一个抽象类，因此只有它的实现类才能使用。它内部封装了HandlerThread和Handler，从它的构造方法就可以看出来：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public void onCreate() &#123;</div><div class="line">    // TODO: It would be nice to have an option to hold a partial wakelock</div><div class="line">    // during processing, and to have a static startService(Context, Intent)</div><div class="line">    // method that would launch the service &amp; hand off a wakelock.</div><div class="line"></div><div class="line">    super.onCreate();</div><div class="line">    HandlerThread thread = new HandlerThread(&quot;IntentService[&quot; + mName + &quot;]&quot;);</div><div class="line">    thread.start();</div><div class="line"></div><div class="line">    mServiceLooper = thread.getLooper();</div><div class="line">    mServiceHandler = new ServiceHandler(mServiceLooper);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>从这个构造方法中我们可以看到首先创建了一个HandlerThread，然后用它的Looper来创建了一个Handler，这就意味着IntentService的操作逻辑是在HandlerThread中执行了，所以IntetnService是可以用来做耗时操作的，另外由于它是Service的原因，所以它的优先级是要比普通的Thread高的。IntentService首次启动会调用这个构造方法，每次启动都会回调onStartCommad方法，看看onStartCommad方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public void onStart(@Nullable Intent intent, int startId) &#123;</div><div class="line">    Message msg = mServiceHandler.obtainMessage();</div><div class="line">    msg.arg1 = startId;</div><div class="line">    msg.obj = intent;</div><div class="line">    mServiceHandler.sendMessage(msg);</div><div class="line">&#125;</div><div class="line"></div><div class="line">/**</div><div class="line"> * You should not override this method for your IntentService. Instead,</div><div class="line"> * override &#123;@link #onHandleIntent&#125;, which the system calls when the IntentService</div><div class="line"> * receives a start request.</div><div class="line"> * @see android.app.Service#onStartCommand</div><div class="line"> */</div><div class="line">@Override</div><div class="line">public int onStartCommand(@Nullable Intent intent, int flags, int startId) &#123;</div><div class="line">    onStart(intent, startId);</div><div class="line">    return mRedelivery ? START_REDELIVER_INTENT : START_NOT_STICKY;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>onStartCommad方法会调onStart方法，在onStart方法中，将消息发送到了mServiceHandler中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">private final class ServiceHandler extends Handler &#123;</div><div class="line">    public ServiceHandler(Looper looper) &#123;</div><div class="line">        super(looper);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void handleMessage(Message msg) &#123;</div><div class="line">        onHandleIntent((Intent)msg.obj);</div><div class="line">        stopSelf(msg.arg1);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>当消息到达handleMessage会继续掉onHandleIntent方法，当这个onHandleIntent方法执行结束，会调stopSelf(int startId)方法来停止服务,如果目前后多个后台任务，那么当onHandleIntent执行完最后一个任务时，stopSelf(int startId)才会直接停止服务。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">@WorkerThread</div><div class="line">protected abstract void onHandleIntent(@Nullable Intent intent);</div></pre></td></tr></table></figure></p>
+<p>这个方法是一个抽象方法，我们在自己的实现类中实现这个方法，在这个方法中做我们的操作逻辑。</p>
+<p>例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">public class LocalIntentService extends IntentService &#123;</div><div class="line"></div><div class="line">    private static final String TAG = &quot;LocalIntentService&quot;;</div><div class="line"></div><div class="line">    public LocalIntentService() &#123;</div><div class="line">        super(TAG);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onHandleIntent(Intent intent) &#123;</div><div class="line">        String action = intent.getStringExtra(&quot;action&quot;);</div><div class="line">        SystemClock.sleep(1000);</div><div class="line">        Log.d(TAG, &quot;onHandleIntent: &quot; + action);</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void onDestroy() &#123;</div><div class="line">        super.onDestroy();</div><div class="line"></div><div class="line">        Log.d(TAG, &quot;LocalIntentService was Destroy&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>别忘了这是个Service，必须要在清单文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;application&gt;.....&lt;/application&gt;</div></pre></td></tr></table></figure></p>
+<p>里面注册的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;service android:name=&quot;.LocalIntentService&quot;/&gt;</div></pre></td></tr></table></figure>
+<p>执行如下代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">Intent intent = new Intent(this, LocalIntentService.class);</div><div class="line">intent.putExtra(&quot;action&quot;,&quot;task1&quot;);</div><div class="line">startService(intent);</div><div class="line"></div><div class="line">intent.putExtra(&quot;action&quot;,&quot;task2&quot;);</div><div class="line">startService(intent);</div><div class="line"></div><div class="line">intent.putExtra(&quot;action&quot;,&quot;task2&quot;);</div><div class="line">startService(intent);</div></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/jdqm/hello-world/master/thread/Image3.png" alt=""></p>
+<p>可以看到是三个任务结束后才停止服务的。</p>
+<h2 id="VI-Android中的线程池"><a href="#VI-Android中的线程池" class="headerlink" title="VI. Android中的线程池"></a>VI. Android中的线程池</h2><p>1）使用线程池的好处<br>①重用线程池中的线程，避免因为线程的创建和销毁带来的系统性能开销；<br>②能有效控制线程池的最大并发数，避免大量线程之间因互相抢占系统资源而导致阻塞的现象；<br>③能够对线程进行简单的管理，并提供定时执行和指定间隔时间循环执行等功能。</p>
+<p>2）ThreadPoolExecutor<br>android中的线程池概念来源于java中的Executor，而Executor是一个接口，真正线程池的实现 是ThreadPoolExecutor，Android下的线程池主要分为4类，都是直接或间接配置ThreadPoolExecutor来实现的，看看ThreadPoolExecutor构造方法的参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public ThreadPoolExecutor(int corePoolSize,</div><div class="line">                          int maximumPoolSize,</div><div class="line">                          long keepAliveTime,</div><div class="line">                          TimeUnit unit,</div><div class="line">                          BlockingQueue&lt;Runnable&gt; workQueue,</div><div class="line">                          ThreadFactory threadFactory) &#123;&#125;</div></pre></td></tr></table></figure>
+<p>①corePoolSize：线程池的核心线程数，默认情况下，核心线程在线程池中是一直存活的，即使它们处于空闲的状态。如果将ThreadPoolExecutor的allowCoreThreadTimeOut设置为ture，那空闲的核心线程在等待任务的过程中就会有超时策略，时间有keepAliveTime参数所指定，当等待时间超过keepAliveTime所指定的时间后，核心线程就会被终止；</p>
+<p>②maximumPoolSize：线程池所能容纳的最大线程数，包括核心和非核心线程，当活动线程到达最大值，后续的任务就会被阻塞；</p>
+<p>③keepAliveTiem：非核心线程闲置时的超时时长，当非核心线程空闲时间超过这个值，就会被终止。如果ThreadPoolExecutor的allowCoreThreadTimeOut设置为true，这个时间同样会作用在核心线程上；<br>④unit：keepAliveTime时间单位，这是一个枚举，如：TimeUnit.DAYS等;</p>
+<p><img src="https://raw.githubusercontent.com/jdqm/hello-world/master/thread/Image4.png" alt=""></p>
+<p>⑤workQueue：线程池中的任务队列，通过execute方法提交的Runable对象会存储在这个参数中;</p>
+<p>⑥threadFactory：线程工厂，提供线程的创建功能;</p>
+<p>⑦另外还有一个不常用的参数 RejectedExecutionHandler handler，在线程数量和任务队列到达上限时，会通过这个handler通知外界异常。</p>
+<h2 id="VII-线程池的的执行规则"><a href="#VII-线程池的的执行规则" class="headerlink" title="VII. 线程池的的执行规则"></a>VII. 线程池的的执行规则</h2><p>1）如果线程池中的线程数量未到达核心线程的数量，那么会直接启动一个核心线程来处理任务；<br>2）如果线程池中的线程数已经达到或者超过核心线程数，那么任务会被插入到线程池的任务队列中排队等候；<br>3）如果步骤2中无法插入到任务队列中（原因可能是任务队列已经满了），这个时候如果线程池中的线程数未达到最大容量，则会直接启动一个非核心线程来处理任务；<br>4）如果步骤3中线程数量已经达到最大值，那么就拒绝执行任务， 这个时候就会通过 RejectedExecutionHandler handler这个参数来通知调用者。</p>
+<h2 id="VIII-线程池的分类"><a href="#VIII-线程池的分类" class="headerlink" title="VIII. 线程池的分类"></a>VIII. 线程池的分类</h2><h3 id="FixedThreadPool"><a href="#FixedThreadPool" class="headerlink" title="FixedThreadPool"></a><strong>FixedThreadPool</strong></h3><p>通过Executors的newFixedThreadPool方法来创建，这种线程池只有核心线程，没有超时策略，当所有线程处于活动状态时，任务会处于等待状态。由于这种线程池只有核心线程，并且即使空闲也不会被回收（除非线程池被回收），这就意味着它能够快速响应外界的请求。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public static ExecutorService newFixedThreadPool(int nThreads) &#123;</div><div class="line">    return new ThreadPoolExecutor(nThreads, nThreads,</div><div class="line">                                  0L, TimeUnit.MILLISECONDS,</div><div class="line">                                  new LinkedBlockingQueue&lt;Runnable&gt;());</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>通过newFixedThreadPool方法的实现可以看到，线程池的最大容量=核心线程数(nThreads)，没有超时策略。</p>
+<h3 id="CachedThreadPool"><a href="#CachedThreadPool" class="headerlink" title="CachedThreadPool"></a><strong>CachedThreadPool</strong></h3><p>通过Executors的newCachedThreadPool方法来创建<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public static ExecutorService newCachedThreadPool() &#123;</div><div class="line">    return new ThreadPoolExecutor(0, Integer.MAX_VALUE,</div><div class="line">                                  60L, TimeUnit.SECONDS,</div><div class="line">                                  new SynchronousQueue&lt;Runnable&gt;());</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>通过这个方法的实现可以发现，这中线程池没有核心线程，并且最大线程数量是Integer.MAX_VALUE，这就意味着没有线程数量的限制，空闲超时时间为60秒。new SynchronousQueue<runnable>这个任务队列比较特殊，很多时候可以简单理解为一个无法存储的任务队列。也就是说，当有新的任务到来，如果有空闲的线程，则将任务给空闲的线程处理，否则直接创建一个新的线程来处理任务。这将导致任何任务将被立即执行。从它的特性来看，比较适合用来处理大量的耗时较短的任务。</runnable></p>
+<h3 id="ScheduledThreadPool"><a href="#ScheduledThreadPool" class="headerlink" title="ScheduledThreadPool"></a><strong>ScheduledThreadPool</strong></h3><p>通过Executors的newScheduledThreadPool方法来创建<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize) &#123;</div><div class="line">    return new ScheduledThreadPoolExecutor(corePoolSize);</div><div class="line">&#125;</div><div class="line"></div><div class="line">public ScheduledThreadPoolExecutor(int corePoolSize) &#123;</div><div class="line">    super(corePoolSize, Integer.MAX_VALUE,</div><div class="line">          DEFAULT_KEEPALIVE_MILLIS, MILLISECONDS,</div><div class="line">          new DelayedWorkQueue());</div><div class="line">&#125;</div><div class="line"></div><div class="line">private static final long DEFAULT_KEEPALIVE_MILLIS = 10L;</div></pre></td></tr></table></figure></p>
+<p>通过这个方法的实现，可以看到，指定了核心线程数量，非核心线程数没有限制，非核心线程超时时间为10毫秒（相当于空闲后立即回收）。这类线程池适用于执行定时的任务和固定周期的重复任务。</p>
+<h3 id="SingleThreadPool"><a href="#SingleThreadPool" class="headerlink" title="SingleThreadPool"></a><strong>SingleThreadPool</strong></h3><p>通过Executors的newSingleThreadExecutor方法来创建<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public static ExecutorService newSingleThreadExecutor() &#123;</div><div class="line">    return new FinalizableDelegatedExecutorService</div><div class="line">        (new ThreadPoolExecutor(1, 1,</div><div class="line">                                0L, TimeUnit.MILLISECONDS,</div><div class="line">                                new LinkedBlockingQueue&lt;Runnable&gt;()));</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这种线程池只有一个核心线程，它确保所有任务在一个线程中顺序执行。SingleThreadExecutor的意义在于，统一所有的任务在一个线程中处理，这使得这些任务之间不需要处理线程同步问题。</p>
+<h2 id="IX-4种线程池的演示例子"><a href="#IX-4种线程池的演示例子" class="headerlink" title="IX. 4种线程池的演示例子"></a>IX. 4种线程池的演示例子</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">Runnable command = new Runnable() &#123;</div><div class="line">    @Override</div><div class="line">    public void run() &#123;</div><div class="line">        SystemClock.sleep(1000);</div><div class="line">        Log.d(TAG, &quot;command is running&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">ExecutorService fixedThreadPool = Executors.newFixedThreadPool(2);</div><div class="line">fixedThreadPool.execute(command);</div><div class="line"></div><div class="line"></div><div class="line">ExecutorService cachedThreadPool = Executors.newCachedThreadPool();</div><div class="line">cachedThreadPool.execute(command);</div><div class="line"></div><div class="line">ScheduledExecutorService scheduledThreadPool =  Executors.newScheduledThreadPool(4);</div><div class="line">//延时两秒后执行</div><div class="line">scheduledThreadPool.schedule(command, 2000, java.util.concurrent.TimeUnit.MILLISECONDS);</div><div class="line"></div><div class="line">ExecutorService singleThreadPool = Executors.newSingleThreadExecutor();</div><div class="line"></div><div class="line">singleThreadPool.execute(command);</div></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/jdqm/hello-world/master/thread/Image5.png" alt=""></p>
+<h2 id="X-我们在前面说到，AsyncTask使用到了线程池，我们去看看它的线程池是怎么样的"><a href="#X-我们在前面说到，AsyncTask使用到了线程池，我们去看看它的线程池是怎么样的" class="headerlink" title="X. 我们在前面说到，AsyncTask使用到了线程池，我们去看看它的线程池是怎么样的"></a>X. 我们在前面说到，AsyncTask使用到了线程池，我们去看看它的线程池是怎么样的</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">private static final int CORE_POOL_SIZE = Math.max(2, Math.min(CPU_COUNT - 1, 4));</div><div class="line">private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2 + 1;</div><div class="line">private static final int KEEP_ALIVE_SECONDS = 30;</div><div class="line"></div><div class="line">private static final ThreadFactory sThreadFactory = new ThreadFactory() &#123;</div><div class="line">    private final AtomicInteger mCount = new AtomicInteger(1);</div><div class="line"></div><div class="line">    public Thread newThread(Runnable r) &#123;</div><div class="line">        return new Thread(r, &quot;AsyncTask #&quot; + mCount.getAndIncrement());</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">private static final BlockingQueue&lt;Runnable&gt; sPoolWorkQueue =</div><div class="line">        new LinkedBlockingQueue&lt;Runnable&gt;(128);</div><div class="line"></div><div class="line">/**</div><div class="line"> * An &#123;@link Executor&#125; that can be used to execute tasks in parallel.</div><div class="line"> */</div><div class="line">public static final Executor THREAD_POOL_EXECUTOR;</div><div class="line"></div><div class="line">static &#123;</div><div class="line">    ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(</div><div class="line">            CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_SECONDS, TimeUnit.SECONDS,</div><div class="line">            sPoolWorkQueue, sThreadFactory);</div><div class="line">    threadPoolExecutor.allowCoreThreadTimeOut(true);</div><div class="line">    THREAD_POOL_EXECUTOR = threadPoolExecutor;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>①核心线程数：  Math.max(2, Math.min(CPU_COUNT - 1, 4))，其中CPU_COUNT 是CUP的核数，CPU_COUNT = Runtime.getRuntime().availableProcessors();<br>②最大线程数：CPU_COUNT * 2 + 1<br>③超时时间：30S</p>
+<p>以上源码均来自Android-24</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+<div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="Jdqm wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注Jdqm Blog公众号，第一时间接收原创技术沉淀干货。</div>
+</div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="/uploads/wechat-reward.png" alt="Jdqm WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+      <strong>本文作者：</strong>
+      Jdqm
+    </li>
+    <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://www.shengyang.me/2017/03/31/Android的线程与线程池/" title="Android的线程与线程池">http://www.shengyang.me/2017/03/31/Android的线程与线程池/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong>
+      本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Thread/" rel="tag"># Thread</a>
+          
+            <a href="/tags/ThreadPool/" rel="tag"># ThreadPool</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/30/SQL复杂查询/" rel="next" title="SQL复杂查询">
+                <i class="fa fa-chevron-left"></i> SQL复杂查询
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/31/Linux用户组、文件权限详解/" rel="prev" title="Linux用户组、文件权限详解">
+                Linux用户组、文件权限详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.gif"
+               alt="Jdqm" />
+          <p class="site-author-name" itemprop="name">Jdqm</p>
+           
+              <p class="site-description motion-element" itemprop="description">记录平凡的脚步</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jdqm/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/your-user-name" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://douban.com/people/your-user-name" target="_blank" title="豆瓣">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  豆瓣
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/your-user-name" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  知乎
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#I-线程"><span class="nav-number">1.</span> <span class="nav-text">I. 线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#II-线程池"><span class="nav-number">2.</span> <span class="nav-text">II. 线程池</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#III-AsyncTask"><span class="nav-number">3.</span> <span class="nav-text">III. AsyncTask</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IV-HandlerThread"><span class="nav-number">4.</span> <span class="nav-text">IV. HandlerThread</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#V-IntentService"><span class="nav-number">5.</span> <span class="nav-text">V. IntentService</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VI-Android中的线程池"><span class="nav-number">6.</span> <span class="nav-text">VI. Android中的线程池</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VII-线程池的的执行规则"><span class="nav-number">7.</span> <span class="nav-text">VII. 线程池的的执行规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VIII-线程池的分类"><span class="nav-number">8.</span> <span class="nav-text">VIII. 线程池的分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FixedThreadPool"><span class="nav-number">8.1.</span> <span class="nav-text">FixedThreadPool</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CachedThreadPool"><span class="nav-number">8.2.</span> <span class="nav-text">CachedThreadPool</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ScheduledThreadPool"><span class="nav-number">8.3.</span> <span class="nav-text">ScheduledThreadPool</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SingleThreadPool"><span class="nav-number">8.4.</span> <span class="nav-text">SingleThreadPool</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IX-4种线程池的演示例子"><span class="nav-number">9.</span> <span class="nav-text">IX. 4种线程池的演示例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#X-我们在前面说到，AsyncTask使用到了线程池，我们去看看它的线程池是怎么样的"><span class="nav-number">10.</span> <span class="nav-text">X. 我们在前面说到，AsyncTask使用到了线程池，我们去看看它的线程池是怎么样的</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+    <span class="site-pv">
+      您是本站的
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      位访客
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "cb258acbb1a64f0ea27ef53858fcea2a",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+<!-- 背景动画 -->
+<script type="text/javascript" src="/js/src/particle.js"></script>
+</html>
