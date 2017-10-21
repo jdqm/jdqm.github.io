@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="-原理分析 -aidl -跨进程通信," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="上一个项目（下载中心）使用到了AIDL相关的技术，趁现在项目不是特别繁忙，总结一下。首先第一个问题，AIDL是个啥东西？它的全称叫 Android Interface Definition Language，中文叫做安卓接口定义语言，这里面有两个关键字，“Interface”和“Language”，从这两个关键字来看它是一门用于定义接口的语言，既然是语言那自然就有它的语法与规则，但是本着先实现一个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从一个例子开始分析AIDL原理">
+<meta property="og:url" content="https://jdqm.github.io/2017/10/21/aidl/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="上一个项目（下载中心）使用到了AIDL相关的技术，趁现在项目不是特别繁忙，总结一下。首先第一个问题，AIDL是个啥东西？它的全称叫 Android Interface Definition Language，中文叫做安卓接口定义语言，这里面有两个关键字，“Interface”和“Language”，从这两个关键字来看它是一门用于定义接口的语言，既然是语言那自然就有它的语法与规则，但是本着先实现一个">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3631399-dd27b706648a0742.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3631399-3dee016fcfb2cb52.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-10-21T04:18:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从一个例子开始分析AIDL原理">
+<meta name="twitter:description" content="上一个项目（下载中心）使用到了AIDL相关的技术，趁现在项目不是特别繁忙，总结一下。首先第一个问题，AIDL是个啥东西？它的全称叫 Android Interface Definition Language，中文叫做安卓接口定义语言，这里面有两个关键字，“Interface”和“Language”，从这两个关键字来看它是一门用于定义接口的语言，既然是语言那自然就有它的语法与规则，但是本着先实现一个">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/3631399-dd27b706648a0742.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jdqm.github.io/2017/10/21/aidl/"/>
+
+
+
+
+
+  <title>从一个例子开始分析AIDL原理 | Jdqm Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jdqm Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">个人博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jdqm.github.io/2017/10/21/aidl/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">从一个例子开始分析AIDL原理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-21T12:18:30+08:00">
+                2017-10-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/10/21/aidl/" class="leancloud_visitors" data-flag-title="从一个例子开始分析AIDL原理">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一个项目（下载中心）使用到了AIDL相关的技术，趁现在项目不是特别繁忙，总结一下。首先第一个问题，AIDL是个啥东西？它的全称叫 Android Interface Definition Language，中文叫做安卓接口定义语言，这里面有两个关键字，“Interface”和“Language”，从这两个关键字来看它是一门用于定义接口的语言，既然是语言那自然就有它的语法与规则，但是本着先实现一个例子再回过头来学习语法的原则，<a href="http://www.jianshu.com/p/382633129b53" target="_blank" rel="external">下一篇文章</a>再详细说明AIDL的语法。坦率讲，即使你不了解AIDL语法，基本上也能看懂，因为它与Java非常相似。下面通过一个例子来展示如何通过AIDL来实现跨进程通信（IPC）。<br><a id="more"></a><br>假设这样一个场景：有一个DownloadCenter，它可以向外提供下载服务，其他App有下载需求的话就可以通过它提供的服务来完成下载，这种方式非常类似于C/S模型。很明显DownloadCenter和其他App不是在同一个进程中，不能直接调用，就需要通过IPC机制来完成，而Android下的IPC方式有很多，比如：通过Inten传递数据、文件共享、Messenger、ContentProvider、aidl、Socket等，根据业务需求，选用aidl。</p>
+<h1 id="一-先写一个例子"><a href="#一-先写一个例子" class="headerlink" title="一.先写一个例子"></a>一.先写一个例子</h1><p>我们通常把提供服务的一方叫做服务端，请求服务的一方叫做客户端，这里就把服务端命名为 DownloadCenter，客户端就叫 Client，接下来就开始实现这个例子。</p>
+<p>(1) 创建一个普通的Android工程DownloadCenter，接着创建一个包 com.jdqm.downloadcenter.aidl，在这个包下创建一个DownloadTask类。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line">public class DownloadTask implements Parcelable&#123;</div><div class="line"></div><div class="line">    private int id;</div><div class="line"></div><div class="line">    private String url;</div><div class="line"></div><div class="line">    public DownloadTask() &#123;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public DownloadTask(int id, String url) &#123;</div><div class="line">        this.id = id;</div><div class="line">        this.url = url;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    protected DownloadTask(Parcel in) &#123;</div><div class="line">        id = in.readInt();</div><div class="line">        url = in.readString();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static final Creator&lt;DownloadTask&gt; CREATOR = new Creator&lt;DownloadTask&gt;() &#123;</div><div class="line">        @Override</div><div class="line">        public DownloadTask createFromParcel(Parcel in) &#123;</div><div class="line">            return new DownloadTask(in);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public DownloadTask[] newArray(int size) &#123;</div><div class="line">            return new DownloadTask[size];</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public int describeContents() &#123;</div><div class="line">        return 0;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void writeToParcel(Parcel dest, int flags) &#123;</div><div class="line">        dest.writeInt(id);</div><div class="line">        dest.writeString(url);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void readFromParcel(Parcel in) &#123;</div><div class="line">        id = in.readInt();</div><div class="line">        url = in.readString();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    //重写toString方法方便打印</div><div class="line">    @Override</div><div class="line">    public String toString() &#123;</div><div class="line">        return &quot;DownloadTask&#123;&quot; +</div><div class="line">                &quot;id=&quot; + id +</div><div class="line">                &quot;, url=&apos;&quot; + url + &apos;\&apos;&apos; +</div><div class="line">                &apos;&#125;&apos;;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这个类代码看起来很多，其实就定义了两个成员变量id和url，并且实现Parcelable接口，其他的代码都是AS生成的。为什么要实现Parcelable接口？这是因为在跨进程通信过程中，涉及到对象数据的序列化和反序列化。关于Android中实现对象的序列化通常可以实现Parcelable或者Serializable接口，为了更好的理解建议还是先熟悉对象的序列化和反序列化相关的知识，这里就不再深入了。</p>
+<p>插播一个场景：当初在学对象的序列化和反序列化的时候萌生了这样一个幻想，如今春节车票真的是一票难求，想回家的你费尽了心思也没买到一张二等座。假设有这么一个设备能把一个人（对象）序列化，然后通过网络传输到家里，再反序列化出来，这该是多么美好的一件事！</p>
+<p>(2) 在(1)中的包名右键，New-&gt;AIDL-&gt;AIDL File 创建一个aild文件 DownloadTask.aidl<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">// DownloadTask.aidl</div><div class="line">package com.jdqm.downloadcenter.aidl;</div><div class="line"></div><div class="line">parcelable DownloadTask;</div></pre></td></tr></table></figure></p>
+<p>当你在(1)中的包名右键新建一个AIDL文件时，项目的目录结构中main下面多了一个aidl的文件夹，并且会帮你创建一个与你右键的地方相同的包名。紧接着在相同的包名的创建IDownloadCenter.aidl<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">// IDownloadCenter.aidl</div><div class="line">package com.jdqm.downloadcenter.aidl;</div><div class="line"></div><div class="line">interface IDownloadCenter &#123;</div><div class="line">    //添加下载任务</div><div class="line">    void addDownloadTask(in DowloadTask task);</div><div class="line">    </div><div class="line">    //查询所有的添加的下载任务</div><div class="line">    List&lt;DownloadTask&gt; getDownloadTask();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>到这里，你需要Build一下项目，一来是检查有没有错误，更重要的是让Android SDK Tool根据aidl文件生成对应的Java文件，如果Build成功，那么会在app/build/generated/source/aidl/debug下生成IDownloadCenter.java这个文件（切换到Project视图，或者直接double shift搜索更快）。</p>
+<p>(3) 创建服务 DownloadCenterService</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">public class DownloadCenterService extends Service &#123;</div><div class="line"></div><div class="line">    private List&lt;DownloadTask&gt; tasks;</div><div class="line"></div><div class="line">    private DownloadCenter downloadCenter;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void onCreate() &#123;</div><div class="line">        super.onCreate();</div><div class="line">        </div><div class="line">        //由于是在Binder线程池中访问这个集合，所以有必要好线程同步。除非你能确保并发情况下不会出现问题</div><div class="line">        tasks = Collections.synchronizedList(new ArrayList&lt;DownloadTask&gt;());</div><div class="line">        downloadCenter = new DownloadCenter();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Nullable</div><div class="line">    @Override</div><div class="line">    public IBinder onBind(Intent intent) &#123;</div><div class="line">        return downloadCenter;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /**</div><div class="line">     * 完成aidl文件编写后，下次Build时Android SDK tools会根据IDownloadCenter.aidl文件生成</div><div class="line">     * IDownloadCenter.java文件，Stub是它的内部类</div><div class="line">     */</div><div class="line">    private class DownloadCenter extends IDownloadCenter.Stub &#123;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void addDownloadTask(DownloadTask task) throws RemoteException &#123;</div><div class="line">            tasks.add(task);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public List&lt;DownloadTask&gt; getDownloadTask() throws RemoteException &#123;</div><div class="line">            return tasks;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个Service其实也很简单，首先创建一个IDownloadCenter.Stub的实现类DownloadCenter，并且实现其内部的两个抽象方法（可以看到这两个方法就是在aidl文件中声明的方法），然后在onBind()方法将其返回它的一个实例。</p>
+<p>(4) 最后别忘了在AndroidManifest.xml文件中注册这个Service，另外为了让其他应用通过隐式Intent启动，需要给这个Service添加一个intent-filter<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;service android:name=&quot;.DownloadCenterService&quot;&gt;</div><div class="line">    &lt;intent-filter&gt;</div><div class="line">        &lt;action android:name=&quot;jdqm.intent.action.LAUNCH&quot;/&gt;</div><div class="line">        &lt;category android:name=&quot;android.intent.category.DEFAULT&quot;/&gt;</div><div class="line">    &lt;/intent-filter&gt;</div><div class="line">&lt;/service&gt;</div></pre></td></tr></table></figure></p>
+<p>接下来是客户端Client的实现：</p>
+<p>(1) 首先创建一个名为Client的Android工程，然后将服务端的所有aidl文件以及aidl文件中使用到的Java类拷贝到Cilent中，注意包名结构也要和服务端一致，如果不一致在反序列化的时候就会出错。</p>
+<p>(2) 通过bindService与服务端建立连接，完成服务方法调用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div></pre></td><td class="code"><pre><div class="line">public class MainActivity extends AppCompatActivity implements View.OnClickListener &#123;</div><div class="line"></div><div class="line">    private static final String TAG = &quot;MainActivity&quot;;</div><div class="line"></div><div class="line">    private Button btnAddTask;</div><div class="line">    private Button btnGetTasks;</div><div class="line"></div><div class="line">    private DownloadServiceConn serviceConn;</div><div class="line">    private IDownloadCenter downloadCenter;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onCreate(Bundle savedInstanceState) &#123;</div><div class="line">        super.onCreate(savedInstanceState);</div><div class="line">        setContentView(R.layout.activity_main);</div><div class="line">        initViews();</div><div class="line">        serviceConn = new DownloadServiceConn();</div><div class="line">        Intent intent = new Intent(&quot;jdqm.intent.action.LAUNCH&quot;);</div><div class="line">        intent.setPackage(&quot;com.jdqm.downloadcenter&quot;);</div><div class="line">        bindService(intent, serviceConn, BIND_AUTO_CREATE);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private void initViews() &#123;</div><div class="line">        btnAddTask = findViewById(R.id.btnAddTask);</div><div class="line">        btnGetTasks = findViewById(R.id.btnGetTasks);</div><div class="line">        btnAddTask.setOnClickListener(this);</div><div class="line">        btnGetTasks.setOnClickListener(this);</div><div class="line">        btnAddTask.setEnabled(false);</div><div class="line">        btnGetTasks.setEnabled(false);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void onClick(View v) &#123;</div><div class="line">        switch (v.getId()) &#123;</div><div class="line">            case R.id.btnAddTask:</div><div class="line">                try &#123;</div><div class="line">                    Random random = new Random();</div><div class="line">                    int id = random.nextInt(10);</div><div class="line">                    DownloadTask task = new DownloadTask(id, &quot;http://test.jdqm.com/test.aidl&quot;);</div><div class="line">                    </div><div class="line">                    //在客户端直接调用IBinder接口的方法，最终服务端对应的方法会调用，这似乎是在同一个进程中一般</div><div class="line">                    //这是因为Binder机制已经把底层的实现隐藏掉了</div><div class="line">                    downloadCenter.addDownloadTask(task);</div><div class="line">                    Log.d(TAG, &quot;添加任务成功: &quot; + task);</div><div class="line">                &#125; catch (RemoteException e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                    Log.e(TAG, &quot;添加任务失败&quot;);</div><div class="line">                &#125;</div><div class="line">                break;</div><div class="line">            case R.id.btnGetTasks:</div><div class="line">                try &#123;</div><div class="line">                    List&lt;DownloadTask&gt; tasks = downloadCenter.getDownloadTask();</div><div class="line">                    Log.d(TAG, &quot;从服务中获取到已经添加的任务列表: &quot; + tasks);</div><div class="line">                &#125; catch (RemoteException e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                &#125;</div><div class="line">                break;</div><div class="line">            default:</div><div class="line">                break;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private class DownloadServiceConn implements ServiceConnection &#123;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void onServiceConnected(ComponentName name, IBinder service) &#123;</div><div class="line">            Log.d(TAG, &quot;服务已连接&quot;);</div><div class="line"></div><div class="line">            //将绑定服务的返回的IBinder对象转换为目标接口类型</div><div class="line">            downloadCenter = IDownloadCenter.Stub.asInterface(service);</div><div class="line">            btnAddTask.setEnabled(true);</div><div class="line">            btnGetTasks.setEnabled(true);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void onServiceDisconnected(ComponentName name) &#123;</div><div class="line">            Log.d(TAG, &quot;服务已断开&quot;);</div><div class="line">            btnAddTask.setEnabled(false);</div><div class="line">            btnGetTasks.setEnabled(false);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onDestroy() &#123;</div><div class="line">        unbindService(serviceConn);</div><div class="line">        super.onDestroy();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>以上是完整的客户端实现，首先bindService，通过ServiceConnection完成绑定时的回调方法onServiceConnected拿到服务端返回的IBinder对象，通过IDownloadCenter.Stub.asInterface()方法将IBinder转换为目标IBinder类型IDownloadCenter，通过它来完成IDownloadCenter.Stub实现类方法的调用。</p>
+<p>现在将DownloadCenter和Client安装到同一个Android设备中，打开客户端，点击界面里的按钮，下面是输出的log信息：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">/com.jdqm.client D/MainActivity: 服务已连接</div><div class="line">/com.jdqm.client D/MainActivity: 添加任务成功: DownloadTask&#123;id=6, url=&apos;http://test.jdqm.com/test.aidl&apos;&#125;</div><div class="line">/com.jdqm.client D/MainActivity: 从服务中获取到已经添加的任务列表: [DownloadTask&#123;id=6, url=&apos;http://test.jdqm.com/test.aidl&apos;&#125;]</div><div class="line">/com.jdqm.client D/MainActivity: 添加任务成功: DownloadTask&#123;id=5, url=&apos;http://test.jdqm.com/test.aidl&apos;&#125;</div><div class="line">/com.jdqm.client D/MainActivity: 从服务中获取到已经添加的任务列表: [DownloadTask&#123;id=6, url=&apos;http://test.jdqm.com/test.aidl&apos;&#125;, DownloadTask&#123;id=5, url=&apos;http://test.jdqm.com/test.aidl&apos;&#125;]</div></pre></td></tr></table></figure></p>
+<p>到这里，我们完成了客户端与服务端的跨进程通信。虽然没有像唐僧西天取经那样历经九九81难（何苦呢），但也可以回头看看我们走过路了。</p>
+<h1 id="二-回头看看"><a href="#二-回头看看" class="headerlink" title="二.回头看看"></a>二.回头看看</h1><p>先来总结一下步骤：</p>
+<ol>
+<li>在src/main/aidl/下创建了两个 aidl文件：DownloadTask.aidl、IDownloadCenter.aidl;</li>
+<li>创建一个IDownloadCenter.Stub实现类，并在onBind中返回一个实例: DownloadCenter extends IDownloadCenter.Stub;</li>
+<li>在客户端实现一个ServiceConnection;</li>
+<li>Context.bindService(), 在回调onServiceConnected()中接收IBinder实例， 并且调用IDownloadCenter.Stub.asInterface(service)将返回值转换为IDownloadCenter类型。</li>
+<li>调用IDownloadCenter接口中定义的方法来完成跨进程调用；</li>
+<li>调用Context.unbindService()断开连接。</li>
+</ol>
+<p><img src="http://upload-images.jianshu.io/upload_images/3631399-dd27b706648a0742.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="两个项目结构"></p>
+<p>粗略地总结好像并没什么意思，毕竟大多数真谛是隐藏在细节中的。就好比让你回忆初恋的过程，可能你更想回忆起接吻时的感觉！ 首先从IDownloadCenter.aidl生成的IDownloadCenter.java开始。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">public interface IDownloadCenter extends android.os.IInterface &#123;</div><div class="line"></div><div class="line">    public static abstract class Stub extends android.os.Binder implements com.jdqm.downloadcenter.aidl.IDownloadCenter &#123;</div><div class="line">       //省略器内部实现</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    //添加下载任务</div><div class="line">    public void addDownloadTask(com.jdqm.downloadcenter.aidl.DownloadTask task) throws android.os.RemoteException;</div><div class="line">    </div><div class="line">    //查询所有的添加的下载任务</div><div class="line">    public java.util.List&lt;com.jdqm.downloadcenter.aidl.DownloadTask&gt; getDownloadTask() throws android.os.RemoteException;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>打开这个文件代码看起来是真的有点多（130多行），而且格式不太好阅读，所以最好是先格式化一下。所幸的是它的结构很清晰，首先它是一个接口，内部定义了两个接口方法和一个内部类Stub，显然这两个方法就是在aidl文件中定义的方法，连注释都给你搬过来了，可见这个生成工具是如此地用心。重点就是这个内部类Stub，它是一个抽象类，并且实现了IDownloadCenter接口，但它并没有实现接口中的两个方法。还记得在Service中IDownloadCenter.Stub的实现类吗？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">private class DownloadCenter extends IDownloadCenter.Stub &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void addDownloadTask(DownloadTask task) throws RemoteException &#123;</div><div class="line">        tasks.add(task);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public List&lt;DownloadTask&gt; getDownloadTask() throws RemoteException &#123;</div><div class="line">        return tasks;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>接着我们在Service的onBind方法返回了它的一个实例，创建这个Binder的过程做了什么？那就得窥探窥探Stub的真容了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">public static abstract class Stub extends android.os.Binder implements com.jdqm.downloadcenter.aidl.IDownloadCenter &#123;</div><div class="line">        private static final java.lang.String DESCRIPTOR = &quot;com.jdqm.downloadcenter.aidl.IDownloadCenter&quot;;</div><div class="line"></div><div class="line">        public Stub() &#123;</div><div class="line">            this.attachInterface(this, DESCRIPTOR);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public static com.jdqm.downloadcenter.aidl.IDownloadCenter asInterface(android.os.IBinder obj) &#123;</div><div class="line">            if ((obj == null)) &#123;</div><div class="line">                return null;</div><div class="line">            &#125;</div><div class="line">            android.os.IInterface iin = obj.queryLocalInterface(DESCRIPTOR);</div><div class="line">            if (((iin != null) &amp;&amp; (iin instanceof com.jdqm.downloadcenter.aidl.IDownloadCenter))) &#123;</div><div class="line">                return ((com.jdqm.downloadcenter.aidl.IDownloadCenter) iin);</div><div class="line">            &#125;</div><div class="line">            return new com.jdqm.downloadcenter.aidl.IDownloadCenter.Stub.Proxy(obj);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public android.os.IBinder asBinder() &#123;</div><div class="line">            return this;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public boolean onTransact(int code, android.os.Parcel data, android.os.Parcel reply, int flags) throws android.os.RemoteException &#123;</div><div class="line">            //省略内部实现</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        private static class Proxy implements com.jdqm.downloadcenter.aidl.IDownloadCenter &#123;</div><div class="line">            //省略内部实现</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        static final int TRANSACTION_addDownloadTask = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);</div><div class="line">        static final int TRANSACTION_getDownloadTask = (android.os.IBinder.FIRST_CALL_TRANSACTION + 1);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到，在Stub的构造方法中调了this.attachInterface(this, DESCRIPTOR)方法，这个DESCRIPTOR就是IDownloadCenter的完整名称。</p>
+<p>Binder#attachInterface<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public void attachInterface(IInterface owner, String descriptor) &#123;</div><div class="line">    mOwner = owner;</div><div class="line">    mDescriptor = descriptor;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到把当前对象保存到Binder的mOwner，将接口的完整名称保存到Binder的mDescriptor。至此onBind返回了这个对象，交由底层的Binder机制来处理，底层原理之复杂度犹如乾坤大挪移一般深噢，将逻辑转到了客户端。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public void onServiceConnected(ComponentName name, IBinder service) &#123;</div><div class="line">    Log.d(TAG, &quot;服务已连接&quot; );</div><div class="line">    Log.d(TAG, &quot;ComponentName: &quot; + name.getClassName()); //com.jdqm.downloadcenter.DownloadCenterService</div><div class="line">    Log.d(TAG, &quot;service: &quot; + service.getClass().getName()); //android.os.BinderProxy</div><div class="line">    //将绑定服务的返回的IBinder对象转换为目标接口类型</div><div class="line">    downloadCenter = IDownloadCenter.Stub.asInterface(service);</div><div class="line">    btnAddTask.setEnabled(true);</div><div class="line">    btnGetTasks.setEnabled(true);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个方法是在客户端与服务端建立连接完成时回调，这个service到底是什么，是Service中onBind返回的DownloadCenter吗？通过 service.getClass().getName()发现它是一个BinderProxy，接着调用IDownloadCenter.Stub.asInterface(service)，它的实现如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">public static com.jdqm.downloadcenter.aidl.IDownloadCenter asInterface(android.os.IBinder obj) &#123;</div><div class="line">    if ((obj == null)) &#123;</div><div class="line">        return null;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    //这个obj是BinderProxy</div><div class="line">    android.os.IInterface iin = obj.queryLocalInterface(DESCRIPTOR); //返回null</div><div class="line">    if (((iin != null) &amp;&amp; (iin instanceof com.jdqm.downloadcenter.aidl.IDownloadCenter))) &#123;</div><div class="line">        return ((com.jdqm.downloadcenter.aidl.IDownloadCenter) iin);</div><div class="line">    &#125;</div><div class="line">    return new com.jdqm.downloadcenter.aidl.IDownloadCenter.Stub.Proxy(obj);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>首先通过调用了BinderProxy.queryLocalInterface</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">final class BinderProxy implements IBinder &#123;</div><div class="line"></div><div class="line">    public IInterface queryLocalInterface(String descriptor) &#123;</div><div class="line">        return null;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>它的返回值是null，即 iin 为null，所以 IDownloadCenter.Stub.asInterface(service)得到的是IDownloadCenter.Stub.Proxy的实例。</p>
+<p>通过asInterface方法可以得出一个结论：</p>
+<ul>
+<li>如果服务端与客户端在同一个进程，那么在onServiceConnected方法得到的service就是我们在onBind中返回的类型IDownloadCenter.Stub；</li>
+<li>如果不是同一个进程，那得到的就是IDownloadCenter.Stub.Proxy类型；</li>
+</ul>
+<p>拿到了IDownloadCenter.Stub.Proxy，那就可以调用它的方法了 downloadCenter.addDownloadTask(task)，下面是IDownloadCenter.Stub.Proxy的实现：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div></pre></td><td class="code"><pre><div class="line">public static abstract class Stub extends android.os.Binder implements com.jdqm.downloadcenter.aidl.IDownloadCenter &#123;</div><div class="line">        </div><div class="line">        //省略前面代码</div><div class="line">        @Override</div><div class="line">        public boolean onTransact(int code, android.os.Parcel data, android.os.Parcel reply, int flags) throws android.os.RemoteException &#123;</div><div class="line">            switch (code) &#123;</div><div class="line">                case INTERFACE_TRANSACTION: &#123;</div><div class="line">                    reply.writeString(DESCRIPTOR);</div><div class="line">                    return true;</div><div class="line">                &#125;</div><div class="line">                case TRANSACTION_addDownloadTask: &#123;</div><div class="line">                    data.enforceInterface(DESCRIPTOR);</div><div class="line">                    com.jdqm.downloadcenter.aidl.DownloadTask _arg0;</div><div class="line">                    if ((0 != data.readInt())) &#123;</div><div class="line">                        _arg0 = com.jdqm.downloadcenter.aidl.DownloadTask.CREATOR.createFromParcel(data);</div><div class="line">                    &#125; else &#123;</div><div class="line">                        _arg0 = null;</div><div class="line">                    &#125;</div><div class="line">                    this.addDownloadTask(_arg0);</div><div class="line">                    reply.writeNoException();</div><div class="line">                    return true;</div><div class="line">                &#125;</div><div class="line">                case TRANSACTION_getDownloadTask: &#123;</div><div class="line">                    data.enforceInterface(DESCRIPTOR);</div><div class="line">                    java.util.List&lt;com.jdqm.downloadcenter.aidl.DownloadTask&gt; _result = this.getDownloadTask();</div><div class="line">                    reply.writeNoException();</div><div class="line">                    reply.writeTypedList(_result);</div><div class="line">                    return true;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            return super.onTransact(code, data, reply, flags);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        private static class Proxy implements com.jdqm.downloadcenter.aidl.IDownloadCenter &#123;</div><div class="line">            private android.os.IBinder mRemote;</div><div class="line"></div><div class="line">            Proxy(android.os.IBinder remote) &#123;</div><div class="line">                mRemote = remote;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            @Override</div><div class="line">            public android.os.IBinder asBinder() &#123;</div><div class="line">                return mRemote;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            public java.lang.String getInterfaceDescriptor() &#123;</div><div class="line">                return DESCRIPTOR;</div><div class="line">            &#125;</div><div class="line">            </div><div class="line">            //添加下载任务</div><div class="line">            @Override</div><div class="line">            public void addDownloadTask(com.jdqm.downloadcenter.aidl.DownloadTask task) throws android.os.RemoteException &#123;</div><div class="line">                android.os.Parcel _data = android.os.Parcel.obtain();</div><div class="line">                android.os.Parcel _reply = android.os.Parcel.obtain();</div><div class="line">                try &#123;</div><div class="line">                    _data.writeInterfaceToken(DESCRIPTOR);</div><div class="line">                    if ((task != null)) &#123;</div><div class="line">                    </div><div class="line">                        //注意这里写入的是1</div><div class="line">                        _data.writeInt(1);</div><div class="line">                        </div><div class="line">                        //序列化我们传入的实参，到这里你知道为什么跨进程通信的对象需要实现Parcelable接口了吧</div><div class="line">                        task.writeToParcel(_data, 0);</div><div class="line">                    &#125; else &#123;</div><div class="line">                        _data.writeInt(0);</div><div class="line">                    &#125;</div><div class="line">                    </div><div class="line">                    //这个mRemote就是是BinderProxy</div><div class="line">                    mRemote.transact(Stub.TRANSACTION_addDownloadTask, _data, _reply, 0);</div><div class="line">                    _reply.readException();</div><div class="line">                &#125; finally &#123;</div><div class="line">                    _reply.recycle();</div><div class="line">                    _data.recycle();</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            </div><div class="line">            //查询所有的添加的下载任务</div><div class="line">            @Override</div><div class="line">            public java.util.List&lt;com.jdqm.downloadcenter.aidl.DownloadTask&gt; getDownloadTask() throws android.os.RemoteException &#123;</div><div class="line">                android.os.Parcel _data = android.os.Parcel.obtain();</div><div class="line">                android.os.Parcel _reply = android.os.Parcel.obtain();</div><div class="line">                java.util.List&lt;com.jdqm.downloadcenter.aidl.DownloadTask&gt; _result;</div><div class="line">                try &#123;</div><div class="line">                    _data.writeInterfaceToken(DESCRIPTOR);</div><div class="line">                    mRemote.transact(Stub.TRANSACTION_getDownloadTask, _data, _reply, 0);</div><div class="line">                    _reply.readException();</div><div class="line">                    _result = _reply.createTypedArrayList(com.jdqm.downloadcenter.aidl.DownloadTask.CREATOR);</div><div class="line">                &#125; finally &#123;</div><div class="line">                    _reply.recycle();</div><div class="line">                    _data.recycle();</div><div class="line">                &#125;</div><div class="line">                return _result;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        static final int TRANSACTION_addDownloadTask = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);</div><div class="line">        static final int TRANSACTION_getDownloadTask = (android.os.IBinder.FIRST_CALL_TRANSACTION + 1);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>从Proxy#addDownloadTask方法可以看到，通过 task.writeToParcel(_data, 0)，将我们传入的DownloadTask对象进行了序列化，终于知道为啥前面写的DownloadTask要实现Parcelable接口了。接着调用 mRemote.transact(Stub.TRANSACTION_addDownloadTask, _data, _reply, 0)方法，通过前面创建Proxy对象的过程，我们知道这个mRemote是BinderProxy，这样逻辑就交给了底层的Binder机制，服务端的onTransact就会被调用。接下来就看看onTransact方法中 TRANSACTION_addDownloadTask 这个case的实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">public boolean onTransact(int code, android.os.Parcel data, android.os.Parcel reply, int flags) throws android.os.RemoteException &#123;</div><div class="line"></div><div class="line">    switch (code) &#123;</div><div class="line">        case TRANSACTION_addDownloadTask: &#123;</div><div class="line">            data.enforceInterface(DESCRIPTOR);</div><div class="line">            com.jdqm.downloadcenter.aidl.DownloadTask _arg0;</div><div class="line">            if ((0 != data.readInt())) &#123;</div><div class="line">                _arg0 = com.jdqm.downloadcenter.aidl.DownloadTask.CREATOR.createFromParcel(data);</div><div class="line">            &#125; else &#123;</div><div class="line">                _arg0 = null;</div><div class="line">            &#125;</div><div class="line">            this.addDownloadTask(_arg0);</div><div class="line">            reply.writeNoException();</div><div class="line">            return true;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    //省略其他内容</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>首先 if ((0 != data.readInt())) 这个条件是true，因为我们在Proxy#addDownloadTask中写入的是1。但是这里我有一个疑问，为啥这个if语句多了一层圆括号？你知道吗？然后通过DownloadTask.CREATOR.createFromParcel(data)将数据反序列化并赋值给 _arg0，接着调用 this.addDownloadTask(_arg0)，这个this不就是我们在onBind返回的Stub实例吗！就这样服务端方法被调用了。</p>
+<p>另外一个方法getDownloadTask()方法的调用过程也是类似，有区别的是它有返回值，所以onTransact()方法时多了 reply.writeTypedList(_result)，回到transact()方法时将结果反序列化 _result = _reply.createTypedArrayList(com.jdqm.downloadcenter.aidl.DownloadTask.CREATOR)。下面给出一张粗略的工作流程图辅助理解这个过程：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3631399-3dee016fcfb2cb52.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Binder"></p>
+<h1 id="三-最后"><a href="#三-最后" class="headerlink" title="三.最后"></a>三.最后</h1><ul>
+<li><p>在这个例子中，我们是在主线程中调用服务方法downloadCenter.addDownloadTask(task)，在执行mRemote.transact(Stub.TRANSACTION_getDownloadTask, _data, _reply, 0)时调用线程会被挂起，所以如果不能确保远程服务方法的是否耗时时，应该避免在主线程中调用。当然了，aidl还提供了一个关键字 oneway，定义方法时加上这个关键字就不用等待服务端方法返回了，如果这满足你的业务不需要等待结果，那也是一个不错的选择。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">//添加下载任务</div><div class="line">oneway void addDownloadTask(in DownloadTask task);</div></pre></td></tr></table></figure>
+</li>
+<li><p>另外一点就是服务端方法是运行在Binder线程池中的，要考虑好线程同步。</p>
+</li>
+</ul>
+<p>最后并不代表结束了，可能又是一个新的开始。细心的读者可能会留意到前面我们写的aidl文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">// IDownloadCenter.aidl</div><div class="line">package com.jdqm.downloadcenter.aidl;</div><div class="line"></div><div class="line">import com.jdqm.downloadcenter.aidl.DownloadTask;</div><div class="line"></div><div class="line">interface IDownloadCenter &#123;</div><div class="line">    //添加下载任务</div><div class="line">    void addDownloadTask(in DownloadTask task);</div><div class="line"></div><div class="line">    //查询所有的添加的下载任务</div><div class="line">    List&lt;DownloadTask&gt; getDownloadTask();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>其中 addDownloadTask 这个方法的参数前面有一个in，这个 in 是什么？这是一个定向tag，事实上定向tag有3个in、out、inout，它们又是什么含义？<a href="http://www.jianshu.com/p/382633129b53" target="_blank" rel="external">下一篇文章</a>将从零开始探索这3个定向tag的含义以及用法。</p>
+<p>最后，如果你有不同的见解，欢迎留下您的足迹，谢谢大家！</p>
+<p><a href="https://github.com/jdqm/blog-code/tree/master/Client" target="_blank" rel="external">客户端源码</a><br><a href="https://github.com/jdqm/blog-code/tree/master/DownloadCenter" target="_blank" rel="external">服务端源码</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/wechat-qcode.jpg" alt="Jdqm wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎您扫一扫上面的微信公众号，订阅我的博客！</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/原理分析-aidl-跨进程通信/" rel="tag"># -原理分析 -aidl -跨进程通信</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/21/ipc/" rel="next" title="IPC基础">
+                <i class="fa fa-chevron-left"></i> IPC基础
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/21/in-out-inout/" rel="prev" title="探索AIDL定向tag in out inout原理">
+                探索AIDL定向tag in out inout原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Jdqm" />
+          <p class="site-author-name" itemprop="name">Jdqm</p>
+           
+              <p class="site-description motion-element" itemprop="description">I promise you.</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jdqm" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/your-user-name" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      微博
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/your-user-name" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      知乎
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一-先写一个例子"><span class="nav-number">1.</span> <span class="nav-text">一.先写一个例子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二-回头看看"><span class="nav-number">2.</span> <span class="nav-text">二.回头看看</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三-最后"><span class="nav-number">3.</span> <span class="nav-text">三.最后</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Gemini
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("jjrlHzAz1Fx8sCH3er0wcQhv-gzGzoHsz", "FLwiT4qjnHG9XVrad3XJXIia");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
