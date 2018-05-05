@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android,Animation,动画," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Android动画的发展历程：
+
+
+
+3.0之前
+3.0
+5.0
+
+
+
+
+View动画
+增加属性动画，低版本不兼容
+增加转场动画，低版本兼容
+
+
+
+动画在UI开发中算比较重要的一块，合理正确地使用动画可以让你的产品体验更出色。这篇文章主要是总结Android中的动画类型和基本使用方式。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android动画总结">
+<meta property="og:url" content="https://jdqm.github.io/2018/05/05/android-animation/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="Android动画的发展历程：
+
+
+
+3.0之前
+3.0
+5.0
+
+
+
+
+View动画
+增加属性动画，低版本不兼容
+增加转场动画，低版本兼容
+
+
+
+动画在UI开发中算比较重要的一块，合理正确地使用动画可以让你的产品体验更出色。这篇文章主要是总结Android中的动画类型和基本使用方式。">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3631399-db1e5e0c2ae19f70.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3631399-3098e675f5661dec.gif?imageMogr2/auto-orient/strip">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3631399-aea1e8ed8eceb231.gif?imageMogr2/auto-orient/strip">
+<meta property="og:updated_time" content="2018-05-05T10:34:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android动画总结">
+<meta name="twitter:description" content="Android动画的发展历程：
+
+
+
+3.0之前
+3.0
+5.0
+
+
+
+
+View动画
+增加属性动画，低版本不兼容
+增加转场动画，低版本兼容
+
+
+
+动画在UI开发中算比较重要的一块，合理正确地使用动画可以让你的产品体验更出色。这篇文章主要是总结Android中的动画类型和基本使用方式。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/3631399-db1e5e0c2ae19f70.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jdqm.github.io/2018/05/05/android-animation/"/>
+
+
+
+
+
+  <title>Android动画总结 | Jdqm Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jdqm Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">正直、善良、脚踏实地</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jdqm.github.io/2018/05/05/android-animation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android动画总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-05T18:34:54+08:00">
+                2018-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2018/05/05/android-animation/" class="leancloud_visitors" data-flag-title="Android动画总结">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Android动画的发展历程：</p>
+<table>
+<thead>
+<tr>
+<th>3.0之前</th>
+<th>3.0</th>
+<th>5.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>View动画</td>
+<td>增加属性动画，低版本不兼容</td>
+<td>增加转场动画，低版本兼容</td>
+</tr>
+</tbody>
+</table>
+<p>动画在UI开发中算比较重要的一块，合理正确地使用动画可以让你的产品体验更出色。这篇文章主要是总结Android中的动画类型和基本使用方式。<br><a id="more"></a><br><img src="http://upload-images.jianshu.io/upload_images/3631399-db1e5e0c2ae19f70.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Android动画分类"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3631399-3098e675f5661dec.gif?imageMogr2/auto-orient/strip" alt="Demo-属性动画"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3631399-aea1e8ed8eceb231.gif?imageMogr2/auto-orient/strip" alt="转场动画"></p>
+<p><a href="https://github.com/jdqm/AnimationDemo" target="_blank" rel="external">Demo源码: https://github.com/jdqm/AnimationDemo</a></p>
+<h2 id="I-View动画"><a href="#I-View动画" class="headerlink" title="I.View动画"></a>I.View动画</h2><p>View动画从大方面来看，可以分为两类，一类是补间（Tween）动画，即我们只需要提供初始状态和终止状态，动画框架自动计算出中间的状态；另一类帧动画，每一帧图片都需要提供，使用简单，但相对来说耗费的资源就比较多。</p>
+<p>1.TranslationAnimation<br><strong>构造方法一</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * @param fromXDelta 动画开始时的X坐标</div><div class="line"> * @param toXDelta 动画停止时的X坐标</div><div class="line"> * @param fromYDelta 动画开始时的y坐标</div><div class="line"> * @param toYDelta 动画停止时的y坐标</div><div class="line"> *</div><div class="line"> * Note:这里的坐标指定的左上角的坐标</div><div class="line"> */</div><div class="line">public TranslateAnimation(float fromXDelta, float toXDelta, float fromYDelta, float toYDelta)</div></pre></td></tr></table></figure></p>
+<p>1.1举例：将一个图片向右平移100dp，动画时长为300ms，视图停止在动画结束的状态<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Animation ta = new TranslateAnimation(0, dpToPixel(100), 0, 0);</div><div class="line">ta.setDuration(300);//动画时长</div><div class="line">ta.setFillAfter(true); //视图停在动画结束的状态</div><div class="line">imageView.startAnimation(ta);</div></pre></td></tr></table></figure></p>
+<p><strong>构造方法二</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * @param fromXType 指定fromXType的解释方式，可以是 Animation.ABSOLUTE,Animation.RELATIVE_TO_SELF(以自己作为参考点), 或者Animation.RELATIVE_TO_PARENT（以父View作为参考的）.</div><div class="line"> * @param fromXValue 动画开始的x值， 如果fromXType是ABSOLUTE那就指定一个具体的数字，否则就是一个百分比</div><div class="line"> *</div><div class="line"> * Note：其他的参数也是类似的理解方式</div><div class="line"> */</div><div class="line">public TranslateAnimation(int fromXType, float fromXValue, int toXType, float toXValue,</div><div class="line">        int fromYType, float fromYValue, int toYType, float toYValue)</div></pre></td></tr></table></figure></p>
+<p>1.2举例：实现1.1例子一样的效果,即向右平移100dp<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">ta = new TranslateAnimation(</div><div class="line">Animation.ABSOLUTE, 0,</div><div class="line">Animation.ABSOLUTE, dpToPixel(100),</div><div class="line">Animation.ABSOLUTE, 0,</div><div class="line">Animation.ABSOLUTE, 0);</div></pre></td></tr></table></figure></p>
+<p>1.3举例：使用Animation.RELATIVE_TO_PARENT实现从父布局左边移动到父布局的水平中间<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">ta = new TranslateAnimation(</div><div class="line">Animation.RELATIVE_TO_PARENT, 0.0f,</div><div class="line">Animation.RELATIVE_TO_PARENT, 0.5f,</div><div class="line">Animation.ABSOLUTE, 0,</div><div class="line">Animation.ABSOLUTE, 0);</div></pre></td></tr></table></figure></p>
+<p>2.缩放动画-ScaleAnimation<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Animation sa = new ScaleAnimation(1.0f, 1.5f, 1.0f, 1.5f);</div><div class="line">sa.setDuration(300);</div><div class="line">sa.setFillAfter(true);</div><div class="line">imageView.startAnimation(sa);</div></pre></td></tr></table></figure></p>
+<p>3.透明动画-AlphaAnimation<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"> Animation sa = new AlphaAnimation(0.0f, 1.0f);</div><div class="line">sa.setDuration(1000);</div><div class="line">sa.setFillAfter(true);</div><div class="line">imageView.startAnimation(sa);</div></pre></td></tr></table></figure></p>
+<p>4.旋转动画-RotationAnimation<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Animation sa = new RotateAnimation(0, 180);</div><div class="line">sa.setDuration(300);</div><div class="line">sa.setFillAfter(true);</div><div class="line">imageView.startAnimation(sa);</div></pre></td></tr></table></figure></p>
+<p>5.帧动画-FrameAnimation<br>此文件放于 drawable下：music_animation.xml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;animation-list xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    android:oneshot=&quot;false&quot;&gt;</div><div class="line"></div><div class="line">    &lt;item android:drawable=&quot;@drawable/music_play01&quot; android:duration=&quot;150&quot;/&gt;</div><div class="line">    &lt;item android:drawable=&quot;@drawable/music_play02&quot; android:duration=&quot;150&quot;/&gt;</div><div class="line">    &lt;item android:drawable=&quot;@drawable/music_play03&quot; android:duration=&quot;150&quot;/&gt;</div><div class="line">    &lt;item android:drawable=&quot;@drawable/music_play04&quot; android:duration=&quot;150&quot;/&gt;</div><div class="line"></div><div class="line">&lt;/animation-list&gt;</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public class FrameAnimationActivity extends AppCompatActivity &#123;</div><div class="line"></div><div class="line">    private View frameAnimationView;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onCreate(Bundle savedInstanceState) &#123;</div><div class="line">        super.onCreate(savedInstanceState);</div><div class="line">        setContentView(R.layout.activity_twenn_animation);</div><div class="line">        frameAnimationView = findViewById(R.id.frameAnimationView);</div><div class="line">        frameAnimationView.setBackgroundResource(R.drawable.music_animation);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void start(View view) &#123;</div><div class="line">        AnimationDrawable frameAnimation = (AnimationDrawable) frameAnimationView.getBackground();</div><div class="line">        frameAnimation.start();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void stop(View view) &#123;</div><div class="line">        AnimationDrawable frameAnimation = (AnimationDrawable) frameAnimationView.getBackground();</div><div class="line">        frameAnimation.stop();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>View动画除了在Java代码中使用外，还可以在xml中进行定义，放在 res/anim 目录下。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;set xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    android:duration=&quot;300&quot;</div><div class="line">    android:fillAfter=&quot;true&quot;</div><div class="line">    android:fillBefore=&quot;true&quot;</div><div class="line">    android:repeatMode=&quot;restart&quot;</div><div class="line">    android:shareInterpolator=&quot;true&quot;&gt;</div><div class="line"></div><div class="line">    &lt;translate</div><div class="line">        android:fromXDelta=&quot;0&quot;</div><div class="line">        android:fromYDelta=&quot;0&quot;</div><div class="line">        android:toXDelta=&quot;100&quot;</div><div class="line">        android:toYDelta=&quot;0&quot; /&gt;</div><div class="line"></div><div class="line">    &lt;alpha</div><div class="line">        android:fromAlpha=&quot;0&quot;</div><div class="line">        android:toAlpha=&quot;1.0&quot; /&gt;</div><div class="line"></div><div class="line">    &lt;scale</div><div class="line">        android:fromXScale=&quot;0&quot;</div><div class="line">        android:fromYScale=&quot;0&quot;</div><div class="line">        android:pivotX=&quot;0.5&quot;</div><div class="line">        android:pivotY=&quot;0.5&quot;</div><div class="line">        android:toXScale=&quot;1.0&quot;</div><div class="line">        android:toYScale=&quot;1.0&quot; /&gt;</div><div class="line"></div><div class="line">    &lt;rotate</div><div class="line">        android:fromDegrees=&quot;0&quot;</div><div class="line">        android:pivotX=&quot;0.5&quot;</div><div class="line">        android:pivotY=&quot;0.5&quot;</div><div class="line">        android:toDegrees=&quot;360&quot; /&gt;</div><div class="line">&lt;/set&gt;</div></pre></td></tr></table></figure></p>
+<p>在Java代码中使用 AnimationUtils 来加载这个动画资源。这种写法似乎可读性更好一些，当然这个过程涉及到一些XML的解析，性能上可能会有一些影响，但影响不大。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Animation animation = AnimationUtils.loadAnimation(context, R.anim.animations);</div></pre></td></tr></table></figure></p>
+<h2 id="II-属性动画"><a href="#II-属性动画" class="headerlink" title="II.属性动画"></a>II.属性动画</h2><p>1.TranslatorAnimator<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">switch (state) &#123;</div><div class="line">    case 0:</div><div class="line">        imageView.animate().translationX(dpToPixel(100))</div><div class="line">                .setDuration(300)</div><div class="line">                .setInterpolator(new AccelerateDecelerateInterpolator())</div><div class="line">                .setListener(new AnimatorListenerAdapter() &#123;</div><div class="line">                    @Override</div><div class="line">                    public void onAnimationEnd(Animator animation) &#123;</div><div class="line">                        Toast.makeText(context.getApplicationContext(), &quot;平移动画结束了&quot;, Toast.LENGTH_SHORT).show();</div><div class="line">                    &#125;</div><div class="line">                &#125;);</div><div class="line">        //如果View默认的Animator没有你想要改变的属性，可以用下面这种写法</div><div class="line">        //ObjectAnimator animator = ObjectAnimator.ofFloat(imageView, &quot;translationX&quot;, dpToPixel(100));</div><div class="line">        //animator.start();</div><div class="line">        break;</div><div class="line">    case 1:</div><div class="line">        imageView.animate().translationX(0);</div><div class="line">        break;</div><div class="line">    case 2:</div><div class="line">        imageView.animate().translationYBy(dpToPixel(100));</div><div class="line">        break;</div><div class="line">    case 3:</div><div class="line">        imageView.animate().translationYBy(-dpToPixel(100));</div><div class="line">        break;</div><div class="line">    case 4:</div><div class="line">        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</div><div class="line">            imageView.animate().translationZ(dpToPixel(15));</div><div class="line">        &#125;</div><div class="line">        break;</div><div class="line">    case 5:</div><div class="line">        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</div><div class="line">            imageView.animate().translationZ(0);</div><div class="line">        &#125;</div><div class="line">        break;</div><div class="line">    default:</div><div class="line">        break;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>2.ScaleAnimator<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">switch (state) &#123;</div><div class="line">    case 0:</div><div class="line">        imageView.animate().scaleX(1.5f)</div><div class="line">                .setDuration(300)</div><div class="line">                .setInterpolator(new AccelerateDecelerateInterpolator());</div><div class="line">        break;</div><div class="line">    case 1:</div><div class="line">        imageView.animate().scaleX(1.0f);</div><div class="line">        break;</div><div class="line">    case 2:</div><div class="line">        imageView.animate().scaleY(.5f);</div><div class="line">        break;</div><div class="line">    case 3:</div><div class="line">        imageView.animate().scaleY(1.0f);</div><div class="line">        break;</div><div class="line">    default:</div><div class="line">        break;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>3.AlphaAnimator<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">if (state == 0) &#123;</div><div class="line">    imageView.animate().alpha(0);</div><div class="line">    state = 1;</div><div class="line">&#125; else &#123;</div><div class="line">    imageView.animate().alpha(1);</div><div class="line">    state = 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>4.RotationAnimator<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">switch (state) &#123;</div><div class="line">    case 0:</div><div class="line">        imageView.animate().rotation(180);</div><div class="line">        break;</div><div class="line">    case 1:</div><div class="line">        imageView.animate().rotation(0);</div><div class="line">        break;</div><div class="line">    case 2:</div><div class="line">        imageView.animate().rotationX(180);</div><div class="line">        break;</div><div class="line">    case 3:</div><div class="line">        imageView.animate().rotationX(0);</div><div class="line">        break;</div><div class="line">    case 4:</div><div class="line">        imageView.animate().rotationY(180);</div><div class="line">        break;</div><div class="line">    case 5:</div><div class="line">        imageView.animate().rotationY(0);</div><div class="line">        break;</div><div class="line">    default:</div><div class="line">        break;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>5.PropertyValueHolder</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">PropertyValuesHolder holder1 = PropertyValuesHolder.ofFloat(&quot;translationX&quot;, dpToPixel(100));</div><div class="line">PropertyValuesHolder holder2 = PropertyValuesHolder.ofFloat(&quot;alpha&quot;, 1.0f);</div><div class="line">PropertyValuesHolder holder3 = PropertyValuesHolder.ofFloat(&quot;rotation&quot;, 360);</div><div class="line"></div><div class="line">ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(imageView, holder1, holder2, holder3);</div><div class="line">animator.setDuration(500)</div><div class="line">        .start();</div></pre></td></tr></table></figure>
+<p>6.AnimatorSet<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">if (state == 0) &#123;</div><div class="line">    ObjectAnimator animator1 = ObjectAnimator.ofFloat(imageView, &quot;translationX&quot;, dpToPixel(100));</div><div class="line">    ObjectAnimator animator2 = ObjectAnimator.ofFloat(imageView, &quot;rotation&quot;, 360);</div><div class="line">    ObjectAnimator animator3 = ObjectAnimator.ofFloat(imageView, &quot;alpha&quot;, 0);</div><div class="line"></div><div class="line">    AnimatorSet animatorSet = new AnimatorSet();</div><div class="line">    //animatorSet.playTogether(animator1, animator2, animator3);</div><div class="line">    animatorSet.playSequentially(animator1, animator2, animator3);</div><div class="line">    animatorSet.start();</div><div class="line"></div><div class="line">    state = 1;</div><div class="line">&#125; else &#123;</div><div class="line">    ObjectAnimator animator1 = ObjectAnimator.ofFloat(imageView, &quot;translationX&quot;, 0);</div><div class="line">    ObjectAnimator animator2 = ObjectAnimator.ofFloat(imageView, &quot;rotation&quot;, 0);</div><div class="line">    ObjectAnimator animator3 = ObjectAnimator.ofFloat(imageView, &quot;alpha&quot;, 1);</div><div class="line"></div><div class="line">    AnimatorSet animatorSet = new AnimatorSet();</div><div class="line">    animatorSet.playTogether(animator1, animator2, animator3);</div><div class="line">    animatorSet.start();</div><div class="line"></div><div class="line">    state = 0;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="III-转场动画"><a href="#III-转场动画" class="headerlink" title="III.转场动画"></a>III.转场动画</h2><p>在Android5.0以前，要个Activity的切换添加一些动画，可以这么干。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">startActivity(new Intent(this, TransitionActivity.class));</div><div class="line">overridePendingTransition(R.anim.activity_enter_anim, R.anim.activity_exit_anim);</div></pre></td></tr></table></figure></p>
+<p>activity_enter_anim.xml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;set xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    android:duration=&quot;500&quot;&gt;</div><div class="line">    &lt;translate</div><div class="line">        android:fromXDelta=&quot;100%&quot;</div><div class="line">        android:toXDelta=&quot;0&quot; /&gt;</div><div class="line"></div><div class="line">&lt;/set&gt;</div></pre></td></tr></table></figure></p>
+<p>activity_exit_anim.xml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;set xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    android:duration=&quot;500&quot;&gt;</div><div class="line">    &lt;translate</div><div class="line">        android:fromXDelta=&quot;0&quot;</div><div class="line">        android:toXDelta=&quot;-100%&quot; /&gt;</div><div class="line">&lt;/set&gt;</div></pre></td></tr></table></figure></p>
+<p>但是这种动画只是对整个Activity生效，并不能针对Activity布局里的具体View。Android5.0增加的转场动画，可以有效处理这个问题。</p>
+<p>1.source Activity<br>1.1 Activity java code<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">public void explode(View view) &#123;</div><div class="line">    Intent intent = new Intent(this, TransitionsActivity.class);</div><div class="line">    intent.putExtra(&quot;flag&quot;, 0);</div><div class="line">    if (SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</div><div class="line">        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public void slide(View view) &#123;</div><div class="line">    Intent intent = new Intent(this, TransitionsActivity.class);</div><div class="line">    intent.putExtra(&quot;flag&quot;, 1);</div><div class="line">    if (SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</div><div class="line">        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public void fade(View view) &#123;</div><div class="line">    Intent intent = new Intent(this, TransitionsActivity.class);</div><div class="line">    intent.putExtra(&quot;flag&quot;, 2);</div><div class="line">    if (SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</div><div class="line">        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public void share(View view) &#123;</div><div class="line">    View fab = findViewById(R.id.btnFab);</div><div class="line">    Intent intent = new Intent(this, TransitionsActivity.class);</div><div class="line">    intent.putExtra(&quot;flag&quot;, 3);</div><div class="line">    if (SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</div><div class="line">        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this,</div><div class="line">                Pair.create(view, &quot;share&quot;),</div><div class="line">                Pair.create(fab, &quot;fab&quot;)).toBundle());</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>1.2 activity layout<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;android.support.constraint.ConstraintLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;</div><div class="line">    xmlns:tools=&quot;http://schemas.android.com/tools&quot;</div><div class="line">    android:layout_width=&quot;match_parent&quot;</div><div class="line">    android:layout_height=&quot;match_parent&quot;</div><div class="line">    tools:context=&quot;com.jdqm.animationdemo.transition.TransitionActivity&quot;&gt;</div><div class="line"></div><div class="line">    &lt;Button</div><div class="line">        android:id=&quot;@+id/btnExplode&quot;</div><div class="line">        android:layout_width=&quot;match_parent&quot;</div><div class="line">        android:layout_height=&quot;100dp&quot;</div><div class="line">        android:onClick=&quot;explode&quot;</div><div class="line">        android:text=&quot;explode&quot; /&gt;</div><div class="line"></div><div class="line">    &lt;Button</div><div class="line">        android:id=&quot;@+id/btnSlide&quot;</div><div class="line">        android:layout_width=&quot;match_parent&quot;</div><div class="line">        android:layout_height=&quot;100dp&quot;</div><div class="line">        android:onClick=&quot;slide&quot;</div><div class="line">        android:text=&quot;slide&quot;</div><div class="line">        app:layout_constraintTop_toBottomOf=&quot;@id/btnExplode&quot; /&gt;</div><div class="line"></div><div class="line">    &lt;Button</div><div class="line">        android:id=&quot;@+id/btnFade&quot;</div><div class="line">        android:layout_width=&quot;match_parent&quot;</div><div class="line">        android:layout_height=&quot;100dp&quot;</div><div class="line">        android:onClick=&quot;fade&quot;</div><div class="line">        android:text=&quot;fade&quot;</div><div class="line">        app:layout_constraintTop_toBottomOf=&quot;@id/btnSlide&quot; /&gt;</div><div class="line"></div><div class="line">    &lt;Button</div><div class="line">        android:id=&quot;@+id/btnShare&quot;</div><div class="line">        android:layout_width=&quot;match_parent&quot;</div><div class="line">        android:layout_height=&quot;100dp&quot;</div><div class="line">        android:onClick=&quot;share&quot;</div><div class="line">        android:text=&quot;share&quot;</div><div class="line">        android:transitionName=&quot;share&quot;</div><div class="line">        app:layout_constraintTop_toBottomOf=&quot;@id/btnFade&quot; /&gt;</div><div class="line"></div><div class="line">    &lt;Button</div><div class="line">        android:id=&quot;@+id/btnFab&quot;</div><div class="line">        android:layout_width=&quot;56dp&quot;</div><div class="line">        android:layout_height=&quot;56dp&quot;</div><div class="line">        android:background=&quot;@drawable/ripple_round&quot;</div><div class="line">        android:elevation=&quot;5dp&quot;</div><div class="line">        android:transitionName=&quot;fab&quot;</div><div class="line">        app:layout_constraintTop_toBottomOf=&quot;@id/btnShare&quot; /&gt;</div><div class="line"></div><div class="line">&lt;/android.support.constraint.ConstraintLayout&gt;</div></pre></td></tr></table></figure></p>
+<p>1.3 ripple_round.xml </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    android:shape=&quot;rectangle&quot;&gt;</div><div class="line"></div><div class="line">    &lt;solid android:color=&quot;@android:color/holo_green_dark&quot;/&gt;</div><div class="line">    &lt;corners android:radius=&quot;28dp&quot;/&gt;</div><div class="line"></div><div class="line">&lt;/shape&gt;</div></pre></td></tr></table></figure>
+<p>2.target Activity<br>2.1 Activity Java code<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">public class TransitionsActivity extends AppCompatActivity &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected void onCreate(Bundle savedInstanceState) &#123;</div><div class="line">        super.onCreate(savedInstanceState);</div><div class="line">        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);</div><div class="line">        int flag = getIntent().getExtras().getInt(&quot;flag&quot;);</div><div class="line">        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</div><div class="line">            switch (flag) &#123;</div><div class="line">                case 0:</div><div class="line">                    getWindow().setEnterTransition(new Explode());</div><div class="line">                    break;</div><div class="line">                case 1:</div><div class="line">                    getWindow().setEnterTransition(new Slide());</div><div class="line">                    break;</div><div class="line">                case 2:</div><div class="line">                    getWindow().setEnterTransition(new Fade());</div><div class="line">                    getWindow().setExitTransition(new Fade());</div><div class="line">                    break;</div><div class="line">                case 3:</div><div class="line">                    break;</div><div class="line">                default:</div><div class="line">                    break;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        setContentView(R.layout.activity_transitions);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>2.2 activity_layout<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</div><div class="line">&lt;RelativeLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</div><div class="line">    xmlns:tools=&quot;http://schemas.android.com/tools&quot;</div><div class="line">    android:layout_width=&quot;match_parent&quot;</div><div class="line">    android:layout_height=&quot;match_parent&quot;</div><div class="line">    android:orientation=&quot;vertical&quot;</div><div class="line">    tools:context=&quot;com.jdqm.animationdemo.transition.TransitionsActivity&quot;&gt;</div><div class="line"></div><div class="line">    &lt;View</div><div class="line">        android:id=&quot;@+id/holderView&quot;</div><div class="line">        android:layout_width=&quot;match_parent&quot;</div><div class="line">        android:layout_height=&quot;300dp&quot;</div><div class="line">        android:background=&quot;@color/colorAccent&quot;</div><div class="line">        android:transitionName=&quot;share&quot; /&gt;</div><div class="line"></div><div class="line">    &lt;Button</div><div class="line">        android:id=&quot;@+id/btnFab&quot;</div><div class="line">        android:layout_width=&quot;56dp&quot;</div><div class="line">        android:layout_height=&quot;56dp&quot;</div><div class="line">        android:layout_alignParentEnd=&quot;true&quot;</div><div class="line">        android:layout_below=&quot;@id/holderView&quot;</div><div class="line">        android:layout_marginEnd=&quot;10dp&quot;</div><div class="line">        android:layout_marginTop=&quot;-26dp&quot;</div><div class="line">        android:background=&quot;@drawable/ripple_round&quot;</div><div class="line">        android:elevation=&quot;5dp&quot;</div><div class="line">        android:transitionName=&quot;fab&quot; /&gt;</div><div class="line"></div><div class="line">    &lt;RelativeLayout</div><div class="line">        android:layout_width=&quot;match_parent&quot;</div><div class="line">        android:layout_height=&quot;match_parent&quot;</div><div class="line">        android:layout_below=&quot;@id/holderView&quot;</div><div class="line">        android:layout_marginTop=&quot;10dp&quot;&gt;</div><div class="line"></div><div class="line">        &lt;Button</div><div class="line">            android:id=&quot;@+id/button&quot;</div><div class="line">            android:layout_width=&quot;match_parent&quot;</div><div class="line">            android:layout_height=&quot;60dp&quot;</div><div class="line">            android:layout_below=&quot;@+id/button4&quot; /&gt;</div><div class="line"></div><div class="line">        &lt;Button</div><div class="line">            android:id=&quot;@+id/button4&quot;</div><div class="line">            android:layout_width=&quot;match_parent&quot;</div><div class="line">            android:layout_height=&quot;60dp&quot;</div><div class="line">            android:layout_alignParentStart=&quot;true&quot;</div><div class="line">            android:layout_marginTop=&quot;10dp&quot; /&gt;</div><div class="line">    &lt;/RelativeLayout&gt;</div><div class="line">&lt;/RelativeLayout&gt;</div></pre></td></tr></table></figure></p>
+<h2 id="IV-总结"><a href="#IV-总结" class="headerlink" title="IV.总结"></a>IV.总结</h2><p>动画的实现原理，其实就是通过不断的改变视图的位置并进行重新绘制，难的是如何计算出下一帧的位置、大小等信息，而动画框架则是帮我们完成了这些个杂的计算过程，详情可了解一下动画的插值器Interpolator。</p>
+<p>对于以上所提到View动画、属性动画以及转出动画，在给出的Demo中都有完整的示例。需要注意的是，View动画只是对View的影像做了变换，但其实际事件响应坐标等还是在原来的位置，而属性动画则解决了这个问题。<br>谢谢大家！</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/wc-qcode.jpg" alt="Jdqm wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎您扫一扫上面的微信公众号，订阅我的博客！</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Animation/" rel="tag"># Animation</a>
+          
+            <a href="/tags/动画/" rel="tag"># 动画</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/29/Okhttp3-architecture/" rel="next" title="Okhttp3架构分析">
+                <i class="fa fa-chevron-left"></i> Okhttp3架构分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Jdqm" />
+          <p class="site-author-name" itemprop="name">Jdqm</p>
+           
+              <p class="site-description motion-element" itemprop="description">I promise you.</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">24</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jdqm" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/九点七秒" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      微博
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.zhihu.com/people/Jdqm" target="_blank" title="知乎">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      知乎
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#I-View动画"><span class="nav-number">1.</span> <span class="nav-text">I.View动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#II-属性动画"><span class="nav-number">2.</span> <span class="nav-text">II.属性动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#III-转场动画"><span class="nav-number">3.</span> <span class="nav-text">III.转场动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IV-总结"><span class="nav-number">4.</span> <span class="nav-text">IV.总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Gemini
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("jjrlHzAz1Fx8sCH3er0wcQhv-gzGzoHsz", "FLwiT4qjnHG9XVrad3XJXIia");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
