@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.0.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jdqm.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+  <meta name="description" content="一、垃圾收集器1.如何确定对象已死1.1.引用计数法-Reference Counting给对象添加一个引用计数器，当有新的地方引用它时，引用计数器加1，当引用失效时，计数器减1，任意时刻计数器为0的对象就是不可能被再使用了。这种方式实现简单且高效，但是很难解决循环引用的问题，例如有两个对象A、B，除了相互引用之外，并没有可达引用可以访问到它们中的任意一个，这种情况下其实它们已经是垃圾对象，但是">
+<meta property="og:type" content="website">
+<meta property="og:title" content="JVM(2)-垃圾收集器与内存分配策略">
+<meta property="og:url" content="https://jdqm.github.io/2018/05/12/jvm-collector/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="一、垃圾收集器1.如何确定对象已死1.1.引用计数法-Reference Counting给对象添加一个引用计数器，当有新的地方引用它时，引用计数器加1，当引用失效时，计数器减1，任意时刻计数器为0的对象就是不可能被再使用了。这种方式实现简单且高效，但是很难解决循环引用的问题，例如有两个对象A、B，除了相互引用之外，并没有可达引用可以访问到它们中的任意一个，这种情况下其实它们已经是垃圾对象，但是">
+<meta property="og:locale">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3631399-037b98e4397e4558.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3631399-22b103240b2dbe00.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="article:published_time" content="2018-05-12T15:28:36.000Z">
+<meta property="article:modified_time" content="2018-05-12T15:28:36.000Z">
+<meta property="article:author" content="Jdqm">
+<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="垃圾回收器">
+<meta property="article:tag" content="内存分配">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/3631399-037b98e4397e4558.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+<link rel="canonical" href="https://jdqm.github.io/2018/05/12/jvm-collector/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://jdqm.github.io/2018/05/12/jvm-collector/","path":"2018/05/12/jvm-collector/","title":"JVM(2)-垃圾收集器与内存分配策略"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>JVM(2)-垃圾收集器与内存分配策略 | Jdqm Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Jdqm Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">正直、善良、脚踏实地</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text">一、垃圾收集器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%A6%82%E4%BD%95%E7%A1%AE%E5%AE%9A%E5%AF%B9%E8%B1%A1%E5%B7%B2%E6%AD%BB"><span class="nav-number">1.1.</span> <span class="nav-text">1.如何确定对象已死</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95-Reference-Counting"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1.引用计数法-Reference Counting</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90-Reachability-Analysis"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2.可达性分析-Reachability Analysis</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%94%9F%E5%AD%98%E8%BF%98%E6%98%AF%E6%AD%BB%E4%BA%A1"><span class="nav-number">1.2.</span> <span class="nav-text">2.生存还是死亡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%96%B9%E6%B3%95%E5%8C%BA%E5%9B%9E%E6%94%B6"><span class="nav-number">1.3.</span> <span class="nav-text">3.方法区回收</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95"><span class="nav-number">1.4.</span> <span class="nav-text">4.垃圾回收算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%EF%BC%88Mark-Sweep%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">4.1.标记-清除（Mark-Sweep）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95%EF%BC%88Coping%EF%BC%89"><span class="nav-number">1.5.1.</span> <span class="nav-text">4.2.复制算法（Coping）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-%E6%A0%87%E8%AE%B0-%E6%95%B4%E7%90%86%EF%BC%88Mark-Compact%EF%BC%89"><span class="nav-number">1.6.</span> <span class="nav-text">4.3.标记-整理（Mark-Compact）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%E5%88%86%E4%BB%A3%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95"><span class="nav-number">1.6.1.</span> <span class="nav-text">4.4.分代回收算法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-HotSpot%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.7.</span> <span class="nav-text">5.HotSpot实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1%E6%A0%B9%E8%8A%82%E7%82%B9%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.8.</span> <span class="nav-text">5.1根节点枚举</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E5%AE%89%E5%85%A8%E7%82%B9"><span class="nav-number">1.8.1.</span> <span class="nav-text">5.2.安全点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-%E5%AE%89%E5%85%A8%E5%8C%BA%E5%9F%9F"><span class="nav-number">1.8.2.</span> <span class="nav-text">5.3.安全区域</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">1.9.</span> <span class="nav-text">6.垃圾收集器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-Serial"><span class="nav-number">1.9.1.</span> <span class="nav-text">6.1.Serial</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-ParNew"><span class="nav-number">1.9.2.</span> <span class="nav-text">6.2.ParNew</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-Parallel-Scavenge"><span class="nav-number">1.9.3.</span> <span class="nav-text">6.3.Parallel Scavenge</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-Serial-Old"><span class="nav-number">1.9.4.</span> <span class="nav-text">6.4.Serial Old</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-5-Parallel-Old"><span class="nav-number">1.9.5.</span> <span class="nav-text">6.5 Parallel Old</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-7-CMS"><span class="nav-number">1.9.6.</span> <span class="nav-text">6.7 CMS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-8-G1"><span class="nav-number">1.9.7.</span> <span class="nav-text">6.8.G1</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%AD%96%E7%95%A5"><span class="nav-number">2.</span> <span class="nav-text">二、内存分配策略</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Jdqm</p>
+  <div class="site-description" itemprop="description">I promise you.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://jdqm.github.io/2018/05/12/jvm-collector/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="I promise you.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JVM(2)-垃圾收集器与内存分配策略
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-05-12 23:28:36" itemprop="dateCreated datePublished" datetime="2018-05-12T23:28:36+08:00">2018-05-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p><img src="https://upload-images.jianshu.io/upload_images/3631399-037b98e4397e4558.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="2018-05-09"></p>
+<h1 id="一、垃圾收集器"><a href="#一、垃圾收集器" class="headerlink" title="一、垃圾收集器"></a>一、垃圾收集器</h1><h2 id="1-如何确定对象已死"><a href="#1-如何确定对象已死" class="headerlink" title="1.如何确定对象已死"></a>1.如何确定对象已死</h2><h3 id="1-1-引用计数法-Reference-Counting"><a href="#1-1-引用计数法-Reference-Counting" class="headerlink" title="1.1.引用计数法-Reference Counting"></a>1.1.引用计数法-Reference Counting</h3><p>给对象添加一个引用计数器，当有新的地方引用它时，引用计数器加1，当引用失效时，计数器减1，任意时刻计数器为0的对象就是不可能被再使用了。这种方式实现简单且高效，但是很难解决循环引用的问题，例如有两个对象A、B，除了相互引用之外，并没有可达引用可以访问到它们中的任意一个，这种情况下其实它们已经是垃圾对象，但是它们的引用计数器都不为零。</p>
+<span id="more"></span>
+<h3 id="1-2-可达性分析-Reachability-Analysis"><a href="#1-2-可达性分析-Reachability-Analysis" class="headerlink" title="1.2.可达性分析-Reachability Analysis"></a>1.2.可达性分析-Reachability Analysis</h3><p>这个方法的基本思想是通过一系列的称为 “GC Root”的对象作为起点，从这些节点往下搜索，所经过的路径称为引用链，当一个对象到“GC Root”没有任何引用链相连时，则证明此对象是不可用的。这一些列GC Root对象是哪些对象呢？</p>
+<ul>
+<li>虚拟机栈（栈帧中的本地变量表）中引用的对象</li>
+<li>方法区中的静态属性引用的对象</li>
+<li>方法区中常量引用的对象</li>
+<li>本地方法区中JNI（即一般说的Native方法）引用的对象</li>
+</ul>
+<blockquote>
+<p>note: 关于Java中的4中引用可参考文章<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/c571fa1c5554">《Java中的4种引用类型》</a></p>
+</blockquote>
+<h2 id="2-生存还是死亡"><a href="#2-生存还是死亡" class="headerlink" title="2.生存还是死亡"></a>2.生存还是死亡</h2><ol>
+<li>当一个对象与GC Root没有任何引用链时，那么它会被第一次标记并且进一步筛选，筛选的条件是此对象有没有必要执行finalize()方法。当对象没有覆盖finalize()方法或者finalize()方法已经被调虚拟机调用过，虚拟机将这两种情况视为“没有必要执行”。</li>
+<li>若有必要执行，则将对象放置一个F-Queue的队列中，并在稍后有虚拟机自动建立的、优先级低的Finalizer线程去执行，但并不承诺等待它运行结束，因为不知道finalize()方法的的耗时，盲目等待有可能造成阻塞。</li>
+<li>finalize()方法是对象逃脱死亡命运的最后一次机会，如果在finalize()方法中成功拯救了自己，那就可以继续存活，如果没有逃脱，那么它就真的被回收了。</li>
+</ol>
+<h2 id="3-方法区回收"><a href="#3-方法区回收" class="headerlink" title="3.方法区回收"></a>3.方法区回收</h2><ol>
+<li><p>废弃常量回收，当一个常量没有被任意一个引用变量引用时，此常量就是废弃常量；</p>
+</li>
+<li><p>无用类卸载，无用类要满足下面3个条件：</p>
+</li>
+</ol>
+<ul>
+<li>该类的所有实例都被回收了，即Java堆中不存在该类的任何实例；</li>
+<li>加载该类的ClassLoader已经被回收；</li>
+<li>该类所对应的java.lang.Class对象没有任何地方被引用，无法在任何地方通过发射访问该类的方法。</li>
+</ul>
+<h2 id="4-垃圾回收算法"><a href="#4-垃圾回收算法" class="headerlink" title="4.垃圾回收算法"></a>4.垃圾回收算法</h2><h2 id="4-1-标记-清除（Mark-Sweep）"><a href="#4-1-标记-清除（Mark-Sweep）" class="headerlink" title="4.1.标记-清除（Mark-Sweep）"></a>4.1.标记-清除（Mark-Sweep）</h2><p>首先标记所有可回收的对象，在标记完成后，统一回收。<br>特点：标记清除这两个过程效率都不高，另外一点就是出现内存碎片化问题；</p>
+<h3 id="4-2-复制算法（Coping）"><a href="#4-2-复制算法（Coping）" class="headerlink" title="4.2.复制算法（Coping）"></a>4.2.复制算法（Coping）</h3><p>将可用内存分为大小相等的两块，只使用其中一块，当这一块用完时，将还存活的对象赋值到另外一块中，然后在把这一块上已使用的一次回收掉。<br>特点：实现简单、高效，但这使得可用内存变为原来的一半，代价有点儿高。<br>现代商业虚拟机在新生代中采用这用算法回收，将新生代按照 8:1 的比例分为 Eden 区和两个 Survivor 区，每次只使用Eden和其中一个Survivor，当使用完时，将Eden和Survivor上的存活对象复制到另外一个Survivor上，如果存活的对象超过Survivor的大小，则使用老年代。这样每次使用的内存就是原来的90%，浪费的只有10%。</p>
+<h2 id="4-3-标记-整理（Mark-Compact）"><a href="#4-3-标记-整理（Mark-Compact）" class="headerlink" title="4.3.标记-整理（Mark-Compact）"></a>4.3.标记-整理（Mark-Compact）</h2><p>标记过程与4.1类似，但后续过程是让所有存活对象向一端移动，让后直接清理掉边界以外的内存。</p>
+<h3 id="4-4-分代回收算法"><a href="#4-4-分代回收算法" class="headerlink" title="4.4.分代回收算法"></a>4.4.分代回收算法</h3><p>这并不是一种新的思想，而是根据具体的场景采用合适的回收算法。Java虚拟机一般把堆分为新生代和老年代，新生代的特点是每次垃圾收集时都发现大批对象死去，存活率低，适合采用复制算法；而老年代存活率很高，则采用“标记-清除”或者“标记-整理”算法来进行回收。</p>
+<h2 id="5-HotSpot实现"><a href="#5-HotSpot实现" class="headerlink" title="5.HotSpot实现"></a>5.HotSpot实现</h2><h2 id="5-1根节点枚举"><a href="#5-1根节点枚举" class="headerlink" title="5.1根节点枚举"></a>5.1根节点枚举</h2><p>Stop the world，OopMap，不会为每条指令生成对应的OopMap，只在特定的位置记录这些信息，即安全点。</p>
+<h3 id="5-2-安全点"><a href="#5-2-安全点" class="headerlink" title="5.2.安全点"></a>5.2.安全点</h3><p>抢占试中断，在发生GC时，中断所用用户线程，如果发现某个线程不在安全点，则恢复此线程，让其跑到安全点。现在基本没有虚拟机这个干。<br>主动式中断，当发生GC时，只是设置标记位，让用户线程自己在安全点检查这个标记，如果是ture则自己中断挂起，另外一个检测的地方时需要分配内存的地方。</p>
+<h3 id="5-3-安全区域"><a href="#5-3-安全区域" class="headerlink" title="5.3.安全区域"></a>5.3.安全区域</h3><p>SafePoint似乎能很好的解决进入GC的问题，但试想这样一个场景，当某些线程处于sleep或者blocked状态时，虚拟机很难说等待这些线程得到CUP资源并跑到附近的安全点上，这个时间是不确定的，这就引入了安全区域的概念，当一个线程进入安全区域时，标记位自己在安全区，发生GC时，就不用管在安全区域的线程了，当要离开安全区时它检查是否已经完成了GC，否则中断挂起等待。</p>
+<h2 id="6-垃圾收集器"><a href="#6-垃圾收集器" class="headerlink" title="6.垃圾收集器"></a>6.垃圾收集器</h2><p><img src="https://upload-images.jianshu.io/upload_images/3631399-22b103240b2dbe00.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="来源于: https://blogs.oracle.com/jonthecollector/our-collectors"></p>
+<blockquote>
+<p>图中的连线表示垃圾收集器可以配合工作</p>
+</blockquote>
+<h3 id="6-1-Serial"><a href="#6-1-Serial" class="headerlink" title="6.1.Serial"></a>6.1.Serial</h3><p>新生代收集器，单线程GC，采用复制算法，所用用户线程跑到SafePoint中断，然后执行GC，GC完恢复用户线程，这会导致Stop The World。</p>
+<h3 id="6-2-ParNew"><a href="#6-2-ParNew" class="headerlink" title="6.2.ParNew"></a>6.2.ParNew</h3><p>多线程版的 Serial。</p>
+<h3 id="6-3-Parallel-Scavenge"><a href="#6-3-Parallel-Scavenge" class="headerlink" title="6.3.Parallel Scavenge"></a>6.3.Parallel Scavenge</h3><p>新生代收集器，复制算法，并行多线程收集器，看上去和ParNew一样，但它的关注点不一样，前两个收集器的关注点是尽量缩短GC导致用户线程的停顿时间，而这个收集器的关注点是吞吐量，吞吐量 &#x3D; 运行用户代码时间 &#x2F; （运行用户代码时间 + 垃圾收集时间）。</p>
+<h3 id="6-4-Serial-Old"><a href="#6-4-Serial-Old" class="headerlink" title="6.4.Serial Old"></a>6.4.Serial Old</h3><p>老年代收集器，单线程，使用“标记-整理”算法。</p>
+<h3 id="6-5-Parallel-Old"><a href="#6-5-Parallel-Old" class="headerlink" title="6.5 Parallel Old"></a>6.5 Parallel Old</h3><p>是Parallel Scavenge的老年代版本，使用“标记-整理”算法。</p>
+<h3 id="6-7-CMS"><a href="#6-7-CMS" class="headerlink" title="6.7 CMS"></a>6.7 CMS</h3><p>Concurrent Mark Sweep收集器，关注点是获得最短的回收停顿时间，从名字就看得出来是“标记-清除”算法，它运作过程分为四个步骤：</p>
+<ul>
+<li>初始标记（CMS initial mark）- Stop The World</li>
+<li>并发标记（CMS concurrent mark）</li>
+<li>重新标记（CMS remark）- Stop The World</li>
+<li>并发清除（CMS concurrent sweep）</li>
+</ul>
+<p>在四个步骤中，其中并发标记、并发清除时间是相对较长的，都是可以和用户线程并发执行的，所以Stop The World时间是很短的，总体上来看就是并发执行的，这对要求响应速度较快的应用场景比较适合。CMS还远达不到完美，它有一下几个缺点：</p>
+<ul>
+<li>对CUP资源敏感，抢占CUP资源将导致用户线程的CUP资源减少而变得缓慢；</li>
+<li>无法处理浮动垃圾，在并发回收垃圾时，用户线程会产生新的垃圾对象，这些垃圾要等下次回收；由于在并发回收的过程用户线程还在工作，这就需要预留一定的内存空间给用户线程，导致内存空间利用率下降；</li>
+<li>CMS采用的是标记-清除算法，这就导致内存碎片化。若出现内存空间还很多，但由于碎片化的情况，无法满足大对象的分配，当顶不住要触发Full GC时开启内存碎片合并整理过程，这个过程是不能并发的，会Stop The World。</li>
+</ul>
+<h3 id="6-8-G1"><a href="#6-8-G1" class="headerlink" title="6.8.G1"></a>6.8.G1</h3><p>Garbage First，将内存分为多个Region，使用Remembered Set 避免全盘扫描，标记-整理算法。</p>
+<ul>
+<li>初始标记（initial Marking）</li>
+<li>并发标记（Concurrent Marking）</li>
+<li>最终标记（Final Marking）</li>
+<li>筛选回收（Live Data Counting Evacuation）</li>
+</ul>
+<p>优点：</p>
+<ul>
+<li>并行与并发，能充分利用CUP资源；</li>
+<li>空间整理，与CMS的标记-清理相比，它采用的是标记-整理，从局部Region来看又是复制算法；</li>
+<li>可预测停顿，可以让使用这指定在长度为M毫秒的是时间内，垃圾收集时间不能超过N毫秒；</li>
+</ul>
+<h1 id="二、内存分配策略"><a href="#二、内存分配策略" class="headerlink" title="二、内存分配策略"></a>二、内存分配策略</h1><ol>
+<li><p>对象优先新生代Eden区分配<br>大多数情况下，对象在新生代Eden区分配，若Eden区无法分配，则虚拟机会触发一次Minor GC。</p>
+<blockquote>
+<p>Minor GC-新生代； Major GC&#x2F;Full GC-老年代</p>
+</blockquote>
+</li>
+<li><p>大对象直接直接进入老年代，大对象的界定可通过参数设定；</p>
+</li>
+<li><p>长期存活的对象进入老年代，对象的年龄，Minor GC一次且能被Survivor分区容纳则加1，默认是15岁进入老年代；</p>
+</li>
+<li><p>动态年龄判断，虚拟机并非永远要求对象的年龄到达了MaxTenuringThreshold才能晋升老年代，如果相同年龄的对象总时占据Survivor分区的一半及以上，年龄大于或者等于改年龄的对象就可以直接进入老年代，无须等到年龄到达MaxTenuringThreshold；</p>
+</li>
+<li><p>空间分配担保，处理Minor GC的风险问题，老年代为新生代担保，根据具体情况看是是否执行Full GC，比如老年代的剩余连续空间比新生代大，那就没有必要Full GC，这种情况下Minor GC是没有风险的。</p>
+</li>
+</ol>
+<p>参考资料<br><a target="_blank" rel="noopener" href="https://blogs.oracle.com/jonthecollector/our-collectors">https://blogs.oracle.com/jonthecollector/our-collectors</a></p>
+<p>上一篇：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/b88abdd6bf1a">JVM(1)-运行时数据区</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+              <a href="/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/" rel="tag"># 垃圾回收器</a>
+              <a href="/tags/%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/" rel="tag"># 内存分配</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/05/09/jvm-1/" rel="prev" title="JVM(1)-运行时数据区">
+                  <i class="fa fa-chevron-left"></i> JVM(1)-运行时数据区
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

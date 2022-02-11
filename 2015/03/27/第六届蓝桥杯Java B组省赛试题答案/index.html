@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.0.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jdqm.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+  <meta name="description" content="1、三角形面积 如【图1】所示。图中的所有小方格面积都是1。那么，图中的三角形面积应该是多少呢？ 请填写三角形的面积。不要填写任何多余内容或说明性文字。  这题为不规则图形求面积的问题，通常的解题思路是在不规则图形中寻找规则图形：①整体法：整体视为一个规则图形，减去局部的规则图形②局部法：将不规则图形分解为多个规则图形求解所有方格为1，说明每个方格的长度为1。88-(84+64+82)&#x2F;">
+<meta property="og:type" content="website">
+<meta property="og:title" content="第六届蓝桥杯Java B组省赛试题答案">
+<meta property="og:url" content="https://jdqm.github.io/2015/03/27/%E7%AC%AC%E5%85%AD%E5%B1%8A%E8%93%9D%E6%A1%A5%E6%9D%AFJava%20B%E7%BB%84%E7%9C%81%E8%B5%9B%E8%AF%95%E9%A2%98%E7%AD%94%E6%A1%88/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="1、三角形面积 如【图1】所示。图中的所有小方格面积都是1。那么，图中的三角形面积应该是多少呢？ 请填写三角形的面积。不要填写任何多余内容或说明性文字。  这题为不规则图形求面积的问题，通常的解题思路是在不规则图形中寻找规则图形：①整体法：整体视为一个规则图形，减去局部的规则图形②局部法：将不规则图形分解为多个规则图形求解所有方格为1，说明每个方格的长度为1。88-(84+64+82)&#x2F;">
+<meta property="og:locale">
+<meta property="og:image" content="https://raw.githubusercontent.com/jdqm/hello-world/master/lanqiao6/1.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/jdqm/hello-world/master/lanqiao6/3.jpg">
+<meta property="article:published_time" content="2015-03-27T12:53:10.000Z">
+<meta property="article:modified_time" content="2022-02-11T07:25:13.913Z">
+<meta property="article:author" content="Jdqm">
+<meta property="article:tag" content="-算法 -数据结构">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jdqm/hello-world/master/lanqiao6/1.jpg">
+
+
+<link rel="canonical" href="https://jdqm.github.io/2015/03/27/%E7%AC%AC%E5%85%AD%E5%B1%8A%E8%93%9D%E6%A1%A5%E6%9D%AFJava%20B%E7%BB%84%E7%9C%81%E8%B5%9B%E8%AF%95%E9%A2%98%E7%AD%94%E6%A1%88/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://jdqm.github.io/2015/03/27/%E7%AC%AC%E5%85%AD%E5%B1%8A%E8%93%9D%E6%A1%A5%E6%9D%AFJava%20B%E7%BB%84%E7%9C%81%E8%B5%9B%E8%AF%95%E9%A2%98%E7%AD%94%E6%A1%88/","path":"2015/03/27/第六届蓝桥杯Java B组省赛试题答案/","title":"第六届蓝桥杯Java B组省赛试题答案"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>第六届蓝桥杯Java B组省赛试题答案 | Jdqm Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Jdqm Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">正直、善良、脚踏实地</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Jdqm</p>
+  <div class="site-description" itemprop="description">I promise you.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://jdqm.github.io/2015/03/27/%E7%AC%AC%E5%85%AD%E5%B1%8A%E8%93%9D%E6%A1%A5%E6%9D%AFJava%20B%E7%BB%84%E7%9C%81%E8%B5%9B%E8%AF%95%E9%A2%98%E7%AD%94%E6%A1%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="I promise you.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          第六届蓝桥杯Java B组省赛试题答案
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2015-03-27 20:53:10" itemprop="dateCreated datePublished" datetime="2015-03-27T20:53:10+08:00">2015-03-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-02-11 15:25:13" itemprop="dateModified" datetime="2022-02-11T15:25:13+08:00">2022-02-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>1、三角形面积</p>
+<p>如【图1】所示。图中的所有小方格面积都是1。<br>那么，图中的三角形面积应该是多少呢？</p>
+<p>请填写三角形的面积。不要填写任何多余内容或说明性文字。</p>
+<p><img src="https://raw.githubusercontent.com/jdqm/hello-world/master/lanqiao6/1.jpg" alt="第一题图片"></p>
+<p>这题为不规则图形求面积的问题，通常的解题思路是在不规则图形中寻找规则图形：<br>①整体法：整体视为一个规则图形，减去局部的规则图形<br>②局部法：将不规则图形分解为多个规则图形求解<br>所有方格为1，说明每个方格的长度为1。<br>8<em>8-(8</em>4+6<em>4+8</em>2)&#x2F;2&#x3D;28</p>
+<p>答案：28</p>
+<span id="more"></span>
+
+<p>2、立方变自身</p>
+<p>观察下面的现象,某个数字的立方，按位累加仍然等于自身。<br>1^3 &#x3D; 1<br>8^3  &#x3D; 512    5+1+2&#x3D;8<br>17^3 &#x3D; 4913   4+9+1+3&#x3D;17<br>…</p>
+<p>请你计算包括1,8,17在内，符合这个性质的正整数一共有多少个？</p>
+<p>请填写该数字，不要填写任何多余的内容或说明性的文字。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">package lanqiao;</span><br><span class="line"></span><br><span class="line">public class Two &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		int count = 0;</span><br><span class="line">		// 100*100*100 = 1000000(7位)，即使7位全部为9，也不可能，大于100的就更不可能了</span><br><span class="line">		for (int i = 1; i &lt; 100; i++) &#123;</span><br><span class="line">			int result = i * i * i;</span><br><span class="line">			char[] array = String.valueOf(result).toCharArray();</span><br><span class="line">			int sum = 0;</span><br><span class="line">			StringBuilder builder = new StringBuilder();</span><br><span class="line">			for (int j = 0; j &lt; array.length; j++) &#123;</span><br><span class="line">				sum += Integer.valueOf(array[j] - 48);</span><br><span class="line">				if (j != 0) &#123;</span><br><span class="line">					builder.append(&quot;+&quot;);</span><br><span class="line">				&#125;</span><br><span class="line">				builder.append(array[j]);</span><br><span class="line">			&#125;</span><br><span class="line">			if (i == sum) &#123;</span><br><span class="line">				count++;</span><br><span class="line">				System.out.println(i + &quot;^3=&quot; + result + &quot;,&quot; + i + &quot;=&quot; + builder.toString());</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		System.out.println(&quot;count=&quot; + count);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>1^3&#x3D;1,1&#x3D;1<br>8^3&#x3D;512,8&#x3D;5+1+2<br>17^3&#x3D;4913,17&#x3D;4+9+1+3<br>18^3&#x3D;5832,18&#x3D;5+8+3+2<br>26^3&#x3D;17576,26&#x3D;1+7+5+7+6<br>27^3&#x3D;19683,27&#x3D;1+9+6+8+3</p>
+<p>答案：6</p>
+<p>3、三羊献瑞</p>
+<p>观察下面的加法算式<br><img src="https://raw.githubusercontent.com/jdqm/hello-world/master/lanqiao6/3.jpg" alt="第三题图片"><br>其中，相同的汉字代表相同的数字，不同的汉字代表不同的数字。<br>请你填写“三羊献瑞”所代表的4位数字（答案唯一），不要填写任何多余内容。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">package lanqiao;</span><br><span class="line"></span><br><span class="line">public class Three &#123;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		//两个4位数且各位不相同则为 1023~9876</span><br><span class="line">		for(int i = 1023; i &lt;= 9876; i++)&#123;</span><br><span class="line">			for(int j = 1023; j &lt;= 9876; j++) &#123;</span><br><span class="line">				int sum = i+j;</span><br><span class="line">				//和为5位数，且各位都不相同10234~97654</span><br><span class="line">				if(sum &gt; 10234 &amp;&amp; sum &lt;= 97654) &#123;</span><br><span class="line">					char[] a1 = String.valueOf(i).toCharArray();</span><br><span class="line">					char[] a2 = String.valueOf(j).toCharArray();</span><br><span class="line">					char[] a3 = String.valueOf(sum).toCharArray();</span><br><span class="line">					//三个数相同的数字位</span><br><span class="line">					if(a1[1] == a2[3] &amp;&amp; a1[1]==a3[3] &amp;&amp; a2[3] == a3[3] &amp;&amp;a1[2]==a3[2] &amp;&amp;a2[0]==a3[0]&amp;&amp;a2[1]==a3[1])&#123;</span><br><span class="line">						//第一个数各自的每一位都不相同</span><br><span class="line">						if(a1[0]!=a1[1]&amp;&amp; a1[0]!=a1[2]&amp;&amp; a1[0]!=a1[3]&amp;&amp; a1[1]!=a1[2]&amp;&amp; a1[1]!=a1[3]&amp;&amp; a1[2]!=a1[3])&#123;</span><br><span class="line">							//第二个数各自的每一位都不相同</span><br><span class="line">							if(a2[0]!=a2[1]&amp;&amp; a2[0]!=a2[2]&amp;&amp; a2[0]!=a2[3]&amp;&amp; a2[1]!=a2[2]&amp;&amp; a2[1]!=a2[3]&amp;&amp; a2[2]!=a2[3])&#123;</span><br><span class="line">								//第三个数各自的每一位都不相同</span><br><span class="line">								if(a3[0]!=a3[1]&amp;&amp;a3[0]!=a3[2]&amp;&amp;a3[0]!=a3[3]&amp;&amp;a3[0]!=a3[4]&amp;&amp;a3[1]!=a3[2]&amp;&amp;a3[1]!=a3[3]&amp;&amp;a3[1]!=a3[4]&amp;&amp;a3[2]!=a3[3]&amp;&amp;a3[2]!=a3[4]&amp;&amp;a3[3]!=a3[4])&#123;</span><br><span class="line">									//第一个数的第0位和第3位其他两个数都不包含</span><br><span class="line">									if(!String.valueOf(j).contains(String.valueOf(i).substring(0,1)) &amp;&amp; !String.valueOf(j).contains(String.valueOf(i).substring(3,4)))&#123;</span><br><span class="line">										//第二个数的第2位与第三个数的第二位不相同</span><br><span class="line">										if(a2[2] != a3[2])&#123;</span><br><span class="line">											System.out.println(&quot; &quot; + i);</span><br><span class="line">											System.out.println(&quot; &quot; + j);</span><br><span class="line">											System.out.println(sum);</span><br><span class="line">										&#125;					</span><br><span class="line">									&#125;					</span><br><span class="line">								&#125;</span><br><span class="line">							&#125;</span><br><span class="line">						&#125;</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>打印结果</p>
+<p> 9567<br> 1085<br>10652</p>
+<p>答案：1085</p>
+<p>4、循环节长度</p>
+<p>两个整数做除法，有时会产生循环小数，其循环部分称为：循环节。<br>比如，11&#x2F;13&#x3D;6&#x3D;&gt;0.846153846153…..  其循环节为[846153] 共有6位。<br>下面的方法，可以求出循环节的长度。</p>
+<p>请仔细阅读代码，并填写划线部分缺少的代码。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public static int f(int n, int m)</span><br><span class="line">&#123;</span><br><span class="line">	n = n % m;	</span><br><span class="line">	Vector v = new Vector();</span><br><span class="line">	</span><br><span class="line">	for(;;)</span><br><span class="line">	&#123;</span><br><span class="line">		v.add(n);</span><br><span class="line">		n *= 10;</span><br><span class="line">		n = n % m;</span><br><span class="line">		if(n==0) return 0;</span><br><span class="line">		if(v.indexOf(n)&gt;=0)  _________________________________ ;  //填空</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意，只能填写缺少的部分，不要重复抄写已有代码。不要填写任何多余的文字。</p>
+<p>解题思路：将每次求余的到余数存在Vector中，如果有发现有重复并且不是第0位（第0位有是整数位），这个题目比较简单。</p>
+<p>答案：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">v.size()-v.indexOf(n);</span><br></pre></td></tr></table></figure>
+
+
+<p>5、九数组分数</p>
+<p>1,2,3…9 这九个数字组成一个分数，其值恰好为1&#x2F;3，如何组法？</p>
+<p>下面的程序实现了该功能，请填写划线部分缺失的代码。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">public class A</span><br><span class="line">&#123;</span><br><span class="line">	public static void test(int[] x)</span><br><span class="line">	&#123;</span><br><span class="line">		int a = x[0]*1000 + x[1]*100 + x[2]*10 + x[3];</span><br><span class="line">		int b = x[4]*10000 + x[5]*1000 + x[6]*100 + x[7]*10 + x[8];		</span><br><span class="line">		if(a*3==b) System.out.println(a + &quot; &quot; + b);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	public static void f(int[] x, int k)</span><br><span class="line">	&#123;</span><br><span class="line">		if(k&gt;=x.length)&#123;</span><br><span class="line">			test(x);</span><br><span class="line">			return;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		for(int i=k; i&lt;x.length; i++)&#123;</span><br><span class="line">			&#123;int t=x[k]; x[k]=x[i]; x[i]=t;&#125;</span><br><span class="line">			f(x,k+1);</span><br><span class="line">			_______________________________________       // 填空</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	public static void main(String[] args)</span><br><span class="line">	&#123;</span><br><span class="line">		int[] x = &#123;1,2,3,4,5,6,7,8,9&#125;;		</span><br><span class="line">		f(x,0);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意，只能填写缺少的部分，不要重复抄写已有代码。不要填写任何多余的文字。</p>
+<p>解题思路：这题是排列组合问题，代码中就是对9个数字进行全排列。<br>答案：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;int t=x[k]; x[k]=x[i]; x[i]=t;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>6、加法变乘法</p>
+<p>我们都知道：1+2+3+ … + 49 &#x3D; 1225<br>现在要求你把其中两个不相邻的加号变成乘号，使得结果为2015</p>
+<p>比如：<br>1+2+3+…+10<em>11+12+…+27</em>28+29+…+49 &#x3D; 2015<br>就是符合要求的答案。</p>
+<p>请你寻找另外一个可能的答案，并把位置靠前的那个乘号左边的数字提交（对于示例，就是提交10）。</p>
+<p>注意：需要你提交的是一个整数，不要填写任何多余的内容。</p>
+<p>解题思路：这种题目意思很明确，可以借助计算机的强大计算能力进行遍历,需要注意题目中的“不相邻的加号”。<br>方法一(逆向)：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">package lanqiao;</span><br><span class="line"></span><br><span class="line">public class Six &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">		int sum;</span><br><span class="line">		for (int i = 1; i &lt; 49; i++)&#123;</span><br><span class="line">			for (int j = i+2; j &lt; 49; j++) &#123;</span><br><span class="line">				sum = 1225;</span><br><span class="line">				sum -= i+i+1+j+j+1;//减去四个相乘的数</span><br><span class="line">				sum += i*(i+1)+j*(j+1);</span><br><span class="line">				if(sum == 2015) &#123;</span><br><span class="line">					System.out.println(&quot;i=&quot; + i + &quot;,j=&quot; + j);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>方法二(正向)：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">package lanqiao;</span><br><span class="line"></span><br><span class="line">public class Six &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">		int sum = 0;</span><br><span class="line">		// 总共有48个加号，符号的下标即为左边的数字</span><br><span class="line">		for (int i = 1; i &lt; 49; i++) &#123;</span><br><span class="line">			// 乘号之间至少间距2</span><br><span class="line">			for (int j = i + 2; j &lt; 49; j++) &#123;</span><br><span class="line">				sum = 0;</span><br><span class="line">				for (int k = 1; k &lt; 50; k++) &#123;</span><br><span class="line">					if (i == k || j == k) &#123;</span><br><span class="line">						sum += k * (k + 1);</span><br><span class="line">						k++;//两个数相乘，要略过for循环一次</span><br><span class="line">					&#125; else &#123;</span><br><span class="line">						sum += k;</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">				if (sum == 2015) &#123;</span><br><span class="line">					System.out.println(&quot;i=&quot; + i + &quot;,j=&quot; + j);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>打印结果</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">i=10,j=27</span><br><span class="line">i=16,j=24</span><br></pre></td></tr></table></figure>
+<p>即</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1+2+3+...+10*11+12+...+27*28+29+...+49 = 2015</span><br><span class="line">1+2+3+...+16*17+18+...+24*25+26+...+49 = 2015</span><br></pre></td></tr></table></figure>
+<p>答案：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">16</span><br></pre></td></tr></table></figure>
+<p>7、牌型种数</p>
+<p>小明被劫持到X赌城，被迫与其他3人玩牌。<br>一副扑克牌（去掉大小王牌，共52张），均匀发给4个人，每个人13张。<br>这时，小明脑子里突然冒出一个问题：<br>如果不考虑花色，只考虑点数，也不考虑自己得到的牌的先后顺序，自己手里能拿到的初始牌型组合一共有多少种呢？</p>
+<p>请填写该整数，不要填写任何多余的内容或说明文字。</p>
+<p>解题思路：动态规划</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">package lanqiao;</span><br><span class="line"></span><br><span class="line">public class Seven &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		int[][] dp = new int[14][14];</span><br><span class="line">		dp[0][0] = 1;</span><br><span class="line">		for (int i = 1; i &lt; 14; i++)</span><br><span class="line">			for (int j = 0; j &lt; 14; j++)</span><br><span class="line">				for (int k = 0; k &lt; 5; k++)</span><br><span class="line">					if (j + k &lt;= 13)</span><br><span class="line">						dp[i][j + k] += dp[i - 1][j];</span><br><span class="line">		System.out.println(dp[13][13]);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>答案：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">3598180</span><br></pre></td></tr></table></figure>
+
+<p>8、饮料换购</p>
+<p>乐羊羊饮料厂正在举办一次促销优惠活动。乐羊羊C型饮料，凭3个瓶盖可以再换一瓶C型饮料，并且可以一直循环下去，但不允许赊账。</p>
+<p>请你计算一下，如果小明不浪费瓶盖，尽量地参加活动，那么，对于他初始买入的n瓶饮料，最后他一共能得到多少瓶饮料。</p>
+<p>输入：一个整数n，表示开始购买的饮料数量（0&lt;n&lt;10000）<br>输出：一个整数，表示实际得到的饮料数</p>
+<p>例如：<br>用户输入：<br>100<br>程序应该输出：<br>149</p>
+<p>用户输入：<br>101<br>程序应该输出：<br>151</p>
+<p>资源约定：<br>峰值内存消耗（含虚拟机） &lt; 256M<br>CPU消耗  &lt; 1000ms</p>
+<p>答案：</p>
+<p>请严格按要求输出，不要画蛇添足地打印类似：“请您输入…” 的多余内容。</p>
+<p>所有代码放在同一个源文件中，调试通过后，拷贝提交该源码。<br>注意：不要使用package语句。不要使用jdk1.7及以上版本的特性。<br>注意：主类的名字必须是：Main，否则按无效代码处理。</p>
+<p>解题思路：这道题目逻辑比较清晰简单，但是需要注意这个输入整数的范围，比如是用int 还是long，否则会因为有些测试用例超出了该数据类型所能表示的范围而发生异常，一般比赛里面都会有10个左右的测试用例，每个测试用例对应一定的分数，另外比赛类的题目一定要严格按照指定格式输出，否则就白做了。在比赛中一般是使用黑盒自动化测试。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">import java.util.Scanner;</span><br><span class="line"></span><br><span class="line">public class Main &#123;</span><br><span class="line">	</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		long sum = 0;</span><br><span class="line">		Scanner sc = new Scanner(System.in);</span><br><span class="line">		long n = sc.nextLong();</span><br><span class="line">		sum += n;</span><br><span class="line">		while(n &gt;= 3) &#123;</span><br><span class="line">			long n2 = n / 3;</span><br><span class="line">			sum += n2;</span><br><span class="line">			n = n2 + n % 3;//目前拥有的瓶盖 = 换来的饮料+剩余的瓶盖（不是3的别倍数的时候会有）</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		System.out.println(sum);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p>9、垒骰子</p>
+<p>赌圣atm晚年迷恋上了垒骰子，就是把骰子一个垒在另一个上边，不能歪歪扭扭，要垒成方柱体。<br>经过长期观察，atm 发现了稳定骰子的奥秘：有些数字的面贴着会互相排斥！<br>我们先来规范一下骰子：1 的对面是 4，2 的对面是 5，3 的对面是 6。<br>假设有 m 组互斥现象，每组中的那两个数字的面紧贴在一起，骰子就不能稳定的垒起来。 atm想计算一下有多少种不同的可能的垒骰子方式。<br>两种垒骰子方式相同，当且仅当这两种方式中对应高度的骰子的对应数字的朝向都相同。<br>由于方案数可能过多，请输出模 10^9 + 7 的结果。</p>
+<p>不要小看了 atm 的骰子数量哦～</p>
+<p>「输入格式」<br>第一行两个整数 n m<br>n表示骰子数目<br>接下来 m 行，每行两个整数 a b ，表示 a 和 b 不能紧贴在一起。</p>
+<p>「输出格式」<br>一行一个数，表示答案模 10^9 + 7 的结果。</p>
+<p>「样例输入」<br>2 1<br>1 2</p>
+<p>「样例输出」<br>544</p>
+<p>「数据范围」<br>对于 30% 的数据：n &lt;&#x3D; 5<br>对于 60% 的数据：n &lt;&#x3D; 100<br>对于 100% 的数据：0 &lt; n &lt;&#x3D; 10^9, m &lt;&#x3D; 36</p>
+<p>资源约定：<br>峰值内存消耗（含虚拟机） &lt; 256M<br>CPU消耗  &lt; 2000ms</p>
+<p>请严格按要求输出，不要画蛇添足地打印类似：“请您输入…” 的多余内容。</p>
+<p>所有代码放在同一个源文件中，调试通过后，拷贝提交该源码。<br>注意：不要使用package语句。不要使用jdk1.7及以上版本的特性。<br>注意：主类的名字必须是：Main，否则按无效代码处理。</p>
+<p>解题思路：递推,还得用矩阵加速吧</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">import java.util.Arrays;</span><br><span class="line">import java.util.Scanner;</span><br><span class="line"></span><br><span class="line">public class Main &#123;</span><br><span class="line">	static int MOD = (int) (1e9 + 7);</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		int[][] ar = new int[40][40];</span><br><span class="line">		int[] mm = &#123; 0, 4, 5, 6, 1, 2, 3 &#125;;</span><br><span class="line">		long[][] dp = new long[2][7];</span><br><span class="line">		Scanner in = new Scanner(System.in);</span><br><span class="line">		int n = in.nextInt();</span><br><span class="line">		int m = in.nextInt();</span><br><span class="line">		for (int i = 0; i &lt; m; i++) &#123;</span><br><span class="line">			int u = in.nextInt();</span><br><span class="line">			int v = in.nextInt();</span><br><span class="line">			ar[u][v] = 1;</span><br><span class="line">			ar[v][u] = 1;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		int pre = 1;</span><br><span class="line">		int now = 0;</span><br><span class="line">		for (int i = 1; i &lt; 7; i++)</span><br><span class="line">			dp[0][i] = 4;</span><br><span class="line">		for (int i = 2; i &lt;= n; i++) &#123;</span><br><span class="line">			pre = (pre + 1) % 2;</span><br><span class="line">			now = (now + 1) % 2;</span><br><span class="line">			Arrays.fill(dp[now], 0);</span><br><span class="line">			for (int j = 1; j &lt; 7; j++)</span><br><span class="line">				for (int k = 1; k &lt; 7; k++) &#123;</span><br><span class="line">					dp[now][j] += (dp[pre][k] * 4) % MOD;</span><br><span class="line">				&#125;</span><br><span class="line">			for (int j = 0; j &lt; 7; j++) &#123;</span><br><span class="line">				for (int k = 0; k &lt;= j; k++)</span><br><span class="line">					if (ar[j][k] == 1) &#123;</span><br><span class="line">						dp[now][mm[j]] = (MOD + dp[now][mm[j]] - dp[pre][k] * 4) % MOD;</span><br><span class="line">						dp[now][mm[k]] = (MOD + dp[now][mm[k]] - dp[pre][j] * 4) % MOD;</span><br><span class="line">					&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		long ans = 0;</span><br><span class="line">		for (int i = 1; i &lt; 7; i++)</span><br><span class="line">			ans = (ans + dp[now][i]) % MOD;</span><br><span class="line">		System.out.println(ans);</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>10、生命之树</p>
+<p>在X森林里，上帝创建了生命之树。</p>
+<p>他给每棵树的每个节点（叶子也称为一个节点）上，都标了一个整数，代表这个点的和谐值。<br>上帝要在这棵树内选出一个非空节点集S，使得对于S中的任意两个点a,b，都存在一个点列 {a, v1, v2, …, vk, b} 使得这个点列中的每个点都是S里面的元素，且序列中相邻两个点间有一条边相连。</p>
+<p>在这个前提下，上帝要使得S中的点所对应的整数的和尽量大。<br>这个最大的和就是上帝给生命之树的评分。</p>
+<p>经过atm的努力，他已经知道了上帝给每棵树上每个节点上的整数。但是由于 atm 不擅长计算，他不知道怎样有效的求评分。他需要你为他写一个程序来计算一棵树的分数。</p>
+<p>「输入格式」<br>第一行一个整数 n 表示这棵树有 n 个节点。<br>第二行 n 个整数，依次表示每个节点的评分。<br>接下来 n-1 行，每行 2 个整数 u, v，表示存在一条 u 到 v 的边。由于这是一棵树，所以是不存在环的。</p>
+<p>「输出格式」<br>输出一行一个数，表示上帝给这棵树的分数。</p>
+<p>「样例输入」<br>5<br>1 -2 -3 4 5<br>4 2<br>3 1<br>1 2<br>2 5</p>
+<p>「样例输出」<br>8</p>
+<p>「数据范围」<br>对于 30% 的数据，n &lt;&#x3D; 10<br>对于 100% 的数据，0 &lt; n &lt;&#x3D; 10^5, 每个节点的评分的绝对值不超过 10^6 。</p>
+<p>资源约定：<br>峰值内存消耗（含虚拟机） &lt; 256M<br>CPU消耗  &lt; 3000ms</p>
+<p>请严格按要求输出，不要画蛇添足地打印类似：“请您输入…” 的多余内容。</p>
+<p>所有代码放在同一个源文件中，调试通过后，拷贝提交该源码。<br>注意：不要使用package语句。不要使用jdk1.7及以上版本的特性。<br>注意：主类的名字必须是：Main，否则按无效代码处理。</p>
+<p>解题思路：LAC问题</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line">import java.util.Arrays;</span><br><span class="line">import java.util.Scanner;</span><br><span class="line"></span><br><span class="line">public class Main &#123;</span><br><span class="line">	static int[] head1 = new int[100010];</span><br><span class="line">	static int[] head2 = new int[100010];</span><br><span class="line">	static int[] node = new int[100010];</span><br><span class="line">	static Edge[] edge1 = new Edge[300010];</span><br><span class="line">	static Edge[] edge2 = new Edge[300010];</span><br><span class="line">	static int[] degree = new int[100010];</span><br><span class="line">	static int[] fa = new int[100010];</span><br><span class="line">	static int tot1 = 0, tot2 = 0;</span><br><span class="line">	static int Node;</span><br><span class="line">	static long[] max = new long[100010];</span><br><span class="line">	static long ans = Long.MIN_VALUE;</span><br><span class="line"></span><br><span class="line">	static void add1(int u, int v) &#123;</span><br><span class="line">		edge1[tot1].u = u;</span><br><span class="line">		edge1[tot1].v = v;</span><br><span class="line">		edge1[tot1].nxt = head1[u];</span><br><span class="line">		head1[u] = tot1++;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	static void add2(int u, int v) &#123;</span><br><span class="line">		edge2[tot2].u = u;</span><br><span class="line">		edge2[tot2].v = v;</span><br><span class="line">		edge2[tot2].nxt = head2[u];</span><br><span class="line">		head2[u] = tot2++;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	static void dfs(int u, int par, long nn) &#123;</span><br><span class="line">		max[u] = nn;</span><br><span class="line">		fa[u] = u;</span><br><span class="line">		for (int i = head1[u]; i != -1; i = edge1[i].nxt) &#123;</span><br><span class="line">			int v = edge1[i].v;</span><br><span class="line">			if (v == par)</span><br><span class="line">				continue;</span><br><span class="line">			dfs(v, u, nn + node[v]);</span><br><span class="line">			fa[v] = u;</span><br><span class="line">		&#125;</span><br><span class="line">		for (int i = head2[u]; i != -1; i = edge2[i].nxt) &#123;</span><br><span class="line">			int v = edge2[i].v;</span><br><span class="line">			if (max[v] != Long.MAX_VALUE) &#123;</span><br><span class="line">				ans = Math.max(ans, max[v] + max[u] - max[parent(v)]);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	static int parent(int x) &#123;</span><br><span class="line">		if (fa[x] == -1 || fa[x] == x)</span><br><span class="line">			return x;</span><br><span class="line">		return fa[x] = parent(fa[x]);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		Scanner in = new Scanner(System.in);</span><br><span class="line">		Node = in.nextInt();</span><br><span class="line">		for (int i = 0; i &lt; Node; i++)</span><br><span class="line">			node[i] = in.nextInt();</span><br><span class="line">		for (int i = 0; i &lt;= Node + Node; i++)</span><br><span class="line">			edge1[i] = new Edge();</span><br><span class="line">		for (int i = 0; i &lt;= Node * Node * 2; i++)</span><br><span class="line">			edge2[i] = new Edge();</span><br><span class="line">		Arrays.fill(fa, -1);</span><br><span class="line">		Arrays.fill(head1, -1);</span><br><span class="line">		Arrays.fill(head2, -1);</span><br><span class="line">		Arrays.fill(max, Long.MAX_VALUE);</span><br><span class="line">		for (int i = 1; i &lt; Node; i++) &#123;</span><br><span class="line">			int u, v;</span><br><span class="line">			u = in.nextInt() - 1;</span><br><span class="line">			v = in.nextInt() - 1;</span><br><span class="line">			degree[u]++;</span><br><span class="line">			degree[v]++;</span><br><span class="line">			add1(u, v);</span><br><span class="line">			add1(v, u);</span><br><span class="line">		&#125;</span><br><span class="line">		for (int i = 0; i &lt; Node; i++)</span><br><span class="line">			for (int j = 0; j &lt; Node; j++) &#123;</span><br><span class="line">				add2(i, j);</span><br><span class="line">				add2(j, i);</span><br><span class="line">			&#125;</span><br><span class="line">		if (Node == 2) &#123;</span><br><span class="line">			System.out.println(node[0] + node[1]);</span><br><span class="line">			return;</span><br><span class="line">		&#125;</span><br><span class="line">		dfs(0, -1, node[0]);</span><br><span class="line">		System.out.println(ans);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Edge &#123;</span><br><span class="line">	int u, v, nxt;</span><br><span class="line">	int par;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总体来看，省赛的题目相对来说是比较简单，如愿获得省一等奖，5月份去帝都参加决赛。另外，看起来奖项很多的样子，如果没有什么特别出色的技能，也可以给简历增加一点东西。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag"># -算法 -数据结构</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/01/31/Android%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1/" rel="next" title="Android学习笔记(1)">
+                  Android学习笔记(1) <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.0.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jdqm.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+  <meta name="description" content="要了解Linux下的文件&#x2F;目录的权限，首先应该了解Linux下的用户、用户组的概念。 I. 用户组在linux中的每个用户必须属于一个组，不能独立于组外。在Linux中每个文件有所有者、所在组、其它组的概念。  所有者一般为文件的创建者，谁创建了该文件，就天然的成为该文件的所有者，用”ls ‐ahl”命令可以看到文件的所有者，也可以使用”chown  用户名 文件名”来修改文件的所有者。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Linux用户组、文件权限详解">
+<meta property="og:url" content="https://jdqm.github.io/2017/03/31/Linux%E7%94%A8%E6%88%B7%E7%BB%84%E3%80%81%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="要了解Linux下的文件&#x2F;目录的权限，首先应该了解Linux下的用户、用户组的概念。 I. 用户组在linux中的每个用户必须属于一个组，不能独立于组外。在Linux中每个文件有所有者、所在组、其它组的概念。  所有者一般为文件的创建者，谁创建了该文件，就天然的成为该文件的所有者，用”ls ‐ahl”命令可以看到文件的所有者，也可以使用”chown  用户名 文件名”来修改文件的所有者。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-03-31T07:57:20.000Z">
+<meta property="article:modified_time" content="2022-02-11T07:25:13.902Z">
+<meta property="article:author" content="Jdqm">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="文件权限">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://jdqm.github.io/2017/03/31/Linux%E7%94%A8%E6%88%B7%E7%BB%84%E3%80%81%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90%E8%AF%A6%E8%A7%A3/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://jdqm.github.io/2017/03/31/Linux%E7%94%A8%E6%88%B7%E7%BB%84%E3%80%81%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90%E8%AF%A6%E8%A7%A3/","path":"2017/03/31/Linux用户组、文件权限详解/","title":"Linux用户组、文件权限详解"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Linux用户组、文件权限详解 | Jdqm Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Jdqm Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">正直、善良、脚踏实地</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#I-%E7%94%A8%E6%88%B7%E7%BB%84"><span class="nav-number">1.</span> <span class="nav-text">I. 用户组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#II-%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90"><span class="nav-number">2.</span> <span class="nav-text">II. 文件权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#III-%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E7%9A%84%E6%9D%83%E9%99%90"><span class="nav-number">3.</span> <span class="nav-text">III. 修改文件的权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IV-%E6%94%B9%E5%8F%98%E6%96%87%E4%BB%B6%E6%89%80%E6%9C%89%E8%80%85%EF%BC%88chown%EF%BC%89%E5%92%8C%E7%94%A8%E6%88%B7%E7%BB%84%EF%BC%88chgrp%EF%BC%89%E5%91%BD%E4%BB%A4"><span class="nav-number">4.</span> <span class="nav-text">IV. 改变文件所有者（chown）和用户组（chgrp）命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#V-%E6%94%B9%E5%8F%98%E7%94%A8%E6%88%B7%E6%89%80%E5%9C%A8%E7%BB%84"><span class="nav-number">5.</span> <span class="nav-text">V. 改变用户所在组</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Jdqm</p>
+  <div class="site-description" itemprop="description">I promise you.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://jdqm.github.io/2017/03/31/Linux%E7%94%A8%E6%88%B7%E7%BB%84%E3%80%81%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="I promise you.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux用户组、文件权限详解
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2017-03-31 15:57:20" itemprop="dateCreated datePublished" datetime="2017-03-31T15:57:20+08:00">2017-03-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-02-11 15:25:13" itemprop="dateModified" datetime="2022-02-11T15:25:13+08:00">2022-02-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>要了解Linux下的文件&#x2F;目录的权限，首先应该了解Linux下的用户、用户组的概念。</p>
+<h2 id="I-用户组"><a href="#I-用户组" class="headerlink" title="I. 用户组"></a>I. 用户组</h2><p>在linux中的每个用户必须属于一个组，不能独立于组外。在Linux中每个文件有所有者、所在组、其它组的概念。</p>
+<ul>
+<li><p>所有者<br>一般为文件的创建者，谁创建了该文件，就天然的成为该文件的所有者，用”ls ‐ahl”命令可以看到文件的所有者，也可以使用”chown  用户名 文件名”来修改文件的所有者。</p>
+</li>
+<li><p>所在组<br>当某个用户创建了一个文件后，这个文件的所在组就是该用户所在的组，用”ls ‐ahl”命令可以看到文件的所有组，也可以使用”chgrp 组名 文件名”来修改文件所在的组。</p>
+</li>
+<li><p>其它组<br>除开文件的所有者和所在组的用户外，系统的其它用户都是文件的其它组。</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="II-文件权限"><a href="#II-文件权限" class="headerlink" title="II. 文件权限"></a>II. 文件权限</h2><p>在某个有文件的目录执行如下命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -l</span><br></pre></td></tr></table></figure>
+
+<p>我截取其中一个文件的显示详情</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-rw-r--r-- 1 root root 24789 Mar 20 15:58 msgapi.log</span><br></pre></td></tr></table></figure>
+
+<p>“-rw-r–r–”这10位字符展示了不同的用户对这个文件的权限信息。</p>
+<ul>
+<li><p>第一位有三种取值：文件（-）、目录（d），链接（l），这个例子是-代表是一个文件。</p>
+</li>
+<li><p>其余9位每3位一组，分别对应所有者，所在组，其他组；读（r）、写（w）、执行（x）</p>
+</li>
+<li><p>第一组rw-：文件所有者的权限是读、写</p>
+</li>
+<li><p>第二组r–：与文件所有者同一组的用户拥有读权限</p>
+</li>
+<li><p>第三组r–：不与文件所有者同组的其他用户拥有读权限</p>
+</li>
+</ul>
+<p>也可用数字表示为：r&#x3D;4，w&#x3D;2，x&#x3D;1  因此rwx&#x3D;4+2+1&#x3D;7，其实就是3位2进制所对应的10进制的值。</p>
+<p>除了前面10位，后面的字符的含义如下：</p>
+<ul>
+<li><p>1 表示连接的文件数</p>
+</li>
+<li><p>root : 所有者</p>
+</li>
+<li><p>root : 用户组</p>
+</li>
+<li><p>24789  : 文件大小（字节）</p>
+</li>
+<li><p>Mar 20 15:58  :  最后修改时间</p>
+</li>
+<li><p>msgapi.log  : 文件名</p>
+</li>
+</ul>
+<h2 id="III-修改文件的权限"><a href="#III-修改文件的权限" class="headerlink" title="III. 修改文件的权限"></a>III. 修改文件的权限</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod 权限标识符 目标文件</span><br></pre></td></tr></table></figure>
+
+<p>chmod 改变文件或目录的权限</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod 777 msgapi.log</span><br></pre></td></tr></table></figure>
+<p>修改msgapi.log的权限为所有用户都可读可写可执行,在次执行 “ls -l”命令，结果如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-rwxrwxrwx 1 root root 24789 Mar 20 15:58 msgapi.log</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>chmod u&#x3D;rwx，g&#x3D;rwx，o&#x3D;rwx msgapi.log：同上,u&#x3D;用户权限，g&#x3D;组权限，o&#x3D;不同组其他用户权限</p>
+<p>chmod u-x，g+w msgapi.log：给msgapi.log去除用户执行的权限，增加组写的权限</p>
+<p>chmod a+r msgapi.log：给所有用户添加读的权限</p>
+<h2 id="IV-改变文件所有者（chown）和用户组（chgrp）命令"><a href="#IV-改变文件所有者（chown）和用户组（chgrp）命令" class="headerlink" title="IV. 改变文件所有者（chown）和用户组（chgrp）命令"></a>IV. 改变文件所有者（chown）和用户组（chgrp）命令</h2><p>chown xiaoming msgapi.log：改变msgapi.log的所有者为xiaoming</p>
+<p>chgrp root msgapi.log：改变msgapi.log所属的组为root</p>
+<p>chown root .&#x2F;msgapi：改变msgapi这个目录的所有者是root</p>
+<p>chown ‐R root .&#x2F;msgapi：改变msgapi这个目录及其下面所有的文件和目录的所有者是root</p>
+<h2 id="V-改变用户所在组"><a href="#V-改变用户所在组" class="headerlink" title="V. 改变用户所在组"></a>V. 改变用户所在组</h2><p>在添加用户时，可以指定将该用户添加到哪个组中，同样用root的管理权限可以改变某个用户所在的组</p>
+<ul>
+<li>usermod ‐g 组名 用户名</li>
+</ul>
+<p>可以用</p>
+<ul>
+<li>usermod ‐d 目录名 用户名，改变该用户登录的初始目录</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90/" rel="tag"># 文件权限</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/03/31/Android%E7%9A%84%E7%BA%BF%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0/" rel="prev" title="Android的线程与线程池">
+                  <i class="fa fa-chevron-left"></i> Android的线程与线程池
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/03/31/Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95/" rel="next" title="Android性能优化方法">
+                  Android性能优化方法 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

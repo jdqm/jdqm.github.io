@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.0.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jdqm.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+  <meta name="description" content="Android动画的发展历程：    3.0之前 3.0 5.0    View动画 增加属性动画，低版本不兼容 增加转场动画，低版本兼容   动画在UI开发中算比较重要的一块，合理正确地使用动画可以让你的产品体验更出色。这篇文章主要是总结Android中的动画类型和基本使用方式。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Android动画总结">
+<meta property="og:url" content="https://jdqm.github.io/2018/05/05/android-animation/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="Android动画的发展历程：    3.0之前 3.0 5.0    View动画 增加属性动画，低版本不兼容 增加转场动画，低版本兼容   动画在UI开发中算比较重要的一块，合理正确地使用动画可以让你的产品体验更出色。这篇文章主要是总结Android中的动画类型和基本使用方式。">
+<meta property="og:locale">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3631399-db1e5e0c2ae19f70.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3631399-3098e675f5661dec.gif?imageMogr2/auto-orient/strip">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3631399-aea1e8ed8eceb231.gif?imageMogr2/auto-orient/strip">
+<meta property="article:published_time" content="2018-05-05T10:34:54.000Z">
+<meta property="article:modified_time" content="2018-05-05T10:34:54.000Z">
+<meta property="article:author" content="Jdqm">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Animation">
+<meta property="article:tag" content="动画">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/3631399-db1e5e0c2ae19f70.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+<link rel="canonical" href="https://jdqm.github.io/2018/05/05/android-animation/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://jdqm.github.io/2018/05/05/android-animation/","path":"2018/05/05/android-animation/","title":"Android动画总结"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Android动画总结 | Jdqm Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Jdqm Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">正直、善良、脚踏实地</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#I-View%E5%8A%A8%E7%94%BB"><span class="nav-number">1.</span> <span class="nav-text">I.View动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#II-%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB"><span class="nav-number">2.</span> <span class="nav-text">II.属性动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#III-%E8%BD%AC%E5%9C%BA%E5%8A%A8%E7%94%BB"><span class="nav-number">3.</span> <span class="nav-text">III.转场动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IV-%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">IV.总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Jdqm</p>
+  <div class="site-description" itemprop="description">I promise you.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://jdqm.github.io/2018/05/05/android-animation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="I promise you.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Android动画总结
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-05-05 18:34:54" itemprop="dateCreated datePublished" datetime="2018-05-05T18:34:54+08:00">2018-05-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>Android动画的发展历程：</p>
+<table>
+<thead>
+<tr>
+<th>3.0之前</th>
+<th>3.0</th>
+<th>5.0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>View动画</td>
+<td>增加属性动画，低版本不兼容</td>
+<td>增加转场动画，低版本兼容</td>
+</tr>
+<tr>
+<td>动画在UI开发中算比较重要的一块，合理正确地使用动画可以让你的产品体验更出色。这篇文章主要是总结Android中的动画类型和基本使用方式。</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<span id="more"></span>
+<p><img src="http://upload-images.jianshu.io/upload_images/3631399-db1e5e0c2ae19f70.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Android动画分类"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3631399-3098e675f5661dec.gif?imageMogr2/auto-orient/strip" alt="Demo-属性动画"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3631399-aea1e8ed8eceb231.gif?imageMogr2/auto-orient/strip" alt="转场动画"></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/jdqm/AnimationDemo">Demo源码: https://github.com/jdqm/AnimationDemo</a></p>
+<h2 id="I-View动画"><a href="#I-View动画" class="headerlink" title="I.View动画"></a>I.View动画</h2><p>View动画从大方面来看，可以分为两类，一类是补间（Tween）动画，即我们只需要提供初始状态和终止状态，动画框架自动计算出中间的状态；另一类帧动画，每一帧图片都需要提供，使用简单，但相对来说耗费的资源就比较多。</p>
+<p>1.TranslationAnimation<br><strong>构造方法一</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @param fromXDelta 动画开始时的X坐标</span><br><span class="line"> * @param toXDelta 动画停止时的X坐标</span><br><span class="line"> * @param fromYDelta 动画开始时的y坐标</span><br><span class="line"> * @param toYDelta 动画停止时的y坐标</span><br><span class="line"> *</span><br><span class="line"> * Note:这里的坐标指定的左上角的坐标</span><br><span class="line"> */</span><br><span class="line">public TranslateAnimation(float fromXDelta, float toXDelta, float fromYDelta, float toYDelta)</span><br></pre></td></tr></table></figure>
+<p>1.1举例：将一个图片向右平移100dp，动画时长为300ms，视图停止在动画结束的状态</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Animation ta = new TranslateAnimation(0, dpToPixel(100), 0, 0);</span><br><span class="line">ta.setDuration(300);//动画时长</span><br><span class="line">ta.setFillAfter(true); //视图停在动画结束的状态</span><br><span class="line">imageView.startAnimation(ta);</span><br></pre></td></tr></table></figure>
+
+<p><strong>构造方法二</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @param fromXType 指定fromXType的解释方式，可以是 Animation.ABSOLUTE,Animation.RELATIVE_TO_SELF(以自己作为参考点), 或者Animation.RELATIVE_TO_PARENT（以父View作为参考的）.</span><br><span class="line"> * @param fromXValue 动画开始的x值， 如果fromXType是ABSOLUTE那就指定一个具体的数字，否则就是一个百分比</span><br><span class="line"> *</span><br><span class="line"> * Note：其他的参数也是类似的理解方式</span><br><span class="line"> */</span><br><span class="line">public TranslateAnimation(int fromXType, float fromXValue, int toXType, float toXValue,</span><br><span class="line">        int fromYType, float fromYValue, int toYType, float toYValue) </span><br></pre></td></tr></table></figure>
+<p>1.2举例：实现1.1例子一样的效果,即向右平移100dp</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ta = new TranslateAnimation(</span><br><span class="line">Animation.ABSOLUTE, 0,</span><br><span class="line">Animation.ABSOLUTE, dpToPixel(100),</span><br><span class="line">Animation.ABSOLUTE, 0,</span><br><span class="line">Animation.ABSOLUTE, 0);</span><br></pre></td></tr></table></figure>
+<p>1.3举例：使用Animation.RELATIVE_TO_PARENT实现从父布局左边移动到父布局的水平中间</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ta = new TranslateAnimation(</span><br><span class="line">Animation.RELATIVE_TO_PARENT, 0.0f,</span><br><span class="line">Animation.RELATIVE_TO_PARENT, 0.5f,</span><br><span class="line">Animation.ABSOLUTE, 0,</span><br><span class="line">Animation.ABSOLUTE, 0);</span><br></pre></td></tr></table></figure>
+
+
+<p>2.缩放动画-ScaleAnimation</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Animation sa = new ScaleAnimation(1.0f, 1.5f, 1.0f, 1.5f);</span><br><span class="line">sa.setDuration(300);</span><br><span class="line">sa.setFillAfter(true);</span><br><span class="line">imageView.startAnimation(sa);</span><br></pre></td></tr></table></figure>
+
+<p>3.透明动画-AlphaAnimation</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> Animation sa = new AlphaAnimation(0.0f, 1.0f);</span><br><span class="line">sa.setDuration(1000);</span><br><span class="line">sa.setFillAfter(true);</span><br><span class="line">imageView.startAnimation(sa);</span><br></pre></td></tr></table></figure>
+<p>4.旋转动画-RotationAnimation</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Animation sa = new RotateAnimation(0, 180);</span><br><span class="line">sa.setDuration(300);</span><br><span class="line">sa.setFillAfter(true);</span><br><span class="line">imageView.startAnimation(sa);</span><br></pre></td></tr></table></figure>
+
+<p>5.帧动画-FrameAnimation<br>此文件放于 drawable下：music_animation.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;animation-list xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    android:oneshot=&quot;false&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;item android:drawable=&quot;@drawable/music_play01&quot; android:duration=&quot;150&quot;/&gt;</span><br><span class="line">    &lt;item android:drawable=&quot;@drawable/music_play02&quot; android:duration=&quot;150&quot;/&gt;</span><br><span class="line">    &lt;item android:drawable=&quot;@drawable/music_play03&quot; android:duration=&quot;150&quot;/&gt;</span><br><span class="line">    &lt;item android:drawable=&quot;@drawable/music_play04&quot; android:duration=&quot;150&quot;/&gt;</span><br><span class="line"></span><br><span class="line">&lt;/animation-list&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">public class FrameAnimationActivity extends AppCompatActivity &#123;</span><br><span class="line"></span><br><span class="line">    private View frameAnimationView;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line">        super.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_twenn_animation);</span><br><span class="line">        frameAnimationView = findViewById(R.id.frameAnimationView);</span><br><span class="line">        frameAnimationView.setBackgroundResource(R.drawable.music_animation);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void start(View view) &#123;</span><br><span class="line">        AnimationDrawable frameAnimation = (AnimationDrawable) frameAnimationView.getBackground();</span><br><span class="line">        frameAnimation.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void stop(View view) &#123;</span><br><span class="line">        AnimationDrawable frameAnimation = (AnimationDrawable) frameAnimationView.getBackground();</span><br><span class="line">        frameAnimation.stop();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>View动画除了在Java代码中使用外，还可以在xml中进行定义，放在 res&#x2F;anim 目录下。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;set xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    android:duration=&quot;300&quot;</span><br><span class="line">    android:fillAfter=&quot;true&quot;</span><br><span class="line">    android:fillBefore=&quot;true&quot;</span><br><span class="line">    android:repeatMode=&quot;restart&quot;</span><br><span class="line">    android:shareInterpolator=&quot;true&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;translate</span><br><span class="line">        android:fromXDelta=&quot;0&quot;</span><br><span class="line">        android:fromYDelta=&quot;0&quot;</span><br><span class="line">        android:toXDelta=&quot;100&quot;</span><br><span class="line">        android:toYDelta=&quot;0&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;alpha</span><br><span class="line">        android:fromAlpha=&quot;0&quot;</span><br><span class="line">        android:toAlpha=&quot;1.0&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;scale</span><br><span class="line">        android:fromXScale=&quot;0&quot;</span><br><span class="line">        android:fromYScale=&quot;0&quot;</span><br><span class="line">        android:pivotX=&quot;0.5&quot;</span><br><span class="line">        android:pivotY=&quot;0.5&quot;</span><br><span class="line">        android:toXScale=&quot;1.0&quot;</span><br><span class="line">        android:toYScale=&quot;1.0&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;rotate</span><br><span class="line">        android:fromDegrees=&quot;0&quot;</span><br><span class="line">        android:pivotX=&quot;0.5&quot;</span><br><span class="line">        android:pivotY=&quot;0.5&quot;</span><br><span class="line">        android:toDegrees=&quot;360&quot; /&gt;</span><br><span class="line">&lt;/set&gt;</span><br></pre></td></tr></table></figure>
+<p>在Java代码中使用 AnimationUtils 来加载这个动画资源。这种写法似乎可读性更好一些，当然这个过程涉及到一些XML的解析，性能上可能会有一些影响，但影响不大。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Animation animation = AnimationUtils.loadAnimation(context, R.anim.animations);</span><br></pre></td></tr></table></figure>
+
+<h2 id="II-属性动画"><a href="#II-属性动画" class="headerlink" title="II.属性动画"></a>II.属性动画</h2><p>1.TranslatorAnimator</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">switch (state) &#123;</span><br><span class="line">    case 0:</span><br><span class="line">        imageView.animate().translationX(dpToPixel(100))</span><br><span class="line">                .setDuration(300)</span><br><span class="line">                .setInterpolator(new AccelerateDecelerateInterpolator())</span><br><span class="line">                .setListener(new AnimatorListenerAdapter() &#123;</span><br><span class="line">                    @Override</span><br><span class="line">                    public void onAnimationEnd(Animator animation) &#123;</span><br><span class="line">                        Toast.makeText(context.getApplicationContext(), &quot;平移动画结束了&quot;, Toast.LENGTH_SHORT).show();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">        //如果View默认的Animator没有你想要改变的属性，可以用下面这种写法</span><br><span class="line">        //ObjectAnimator animator = ObjectAnimator.ofFloat(imageView, &quot;translationX&quot;, dpToPixel(100));</span><br><span class="line">        //animator.start();</span><br><span class="line">        break;</span><br><span class="line">    case 1:</span><br><span class="line">        imageView.animate().translationX(0);</span><br><span class="line">        break;</span><br><span class="line">    case 2:</span><br><span class="line">        imageView.animate().translationYBy(dpToPixel(100));</span><br><span class="line">        break;</span><br><span class="line">    case 3:</span><br><span class="line">        imageView.animate().translationYBy(-dpToPixel(100));</span><br><span class="line">        break;</span><br><span class="line">    case 4:</span><br><span class="line">        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</span><br><span class="line">            imageView.animate().translationZ(dpToPixel(15));</span><br><span class="line">        &#125;</span><br><span class="line">        break;</span><br><span class="line">    case 5:</span><br><span class="line">        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</span><br><span class="line">            imageView.animate().translationZ(0);</span><br><span class="line">        &#125;</span><br><span class="line">        break;</span><br><span class="line">    default:</span><br><span class="line">        break;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.ScaleAnimator</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">switch (state) &#123;</span><br><span class="line">    case 0:</span><br><span class="line">        imageView.animate().scaleX(1.5f)</span><br><span class="line">                .setDuration(300)</span><br><span class="line">                .setInterpolator(new AccelerateDecelerateInterpolator());</span><br><span class="line">        break;</span><br><span class="line">    case 1:</span><br><span class="line">        imageView.animate().scaleX(1.0f);</span><br><span class="line">        break;</span><br><span class="line">    case 2:</span><br><span class="line">        imageView.animate().scaleY(.5f);</span><br><span class="line">        break;</span><br><span class="line">    case 3:</span><br><span class="line">        imageView.animate().scaleY(1.0f);</span><br><span class="line">        break;</span><br><span class="line">    default:</span><br><span class="line">        break;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3.AlphaAnimator</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if (state == 0) &#123;</span><br><span class="line">    imageView.animate().alpha(0);</span><br><span class="line">    state = 1;</span><br><span class="line">&#125; else &#123;</span><br><span class="line">    imageView.animate().alpha(1);</span><br><span class="line">    state = 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>4.RotationAnimator</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">switch (state) &#123;</span><br><span class="line">    case 0:</span><br><span class="line">        imageView.animate().rotation(180);</span><br><span class="line">        break;</span><br><span class="line">    case 1:</span><br><span class="line">        imageView.animate().rotation(0);</span><br><span class="line">        break;</span><br><span class="line">    case 2:</span><br><span class="line">        imageView.animate().rotationX(180);</span><br><span class="line">        break;</span><br><span class="line">    case 3:</span><br><span class="line">        imageView.animate().rotationX(0);</span><br><span class="line">        break;</span><br><span class="line">    case 4:</span><br><span class="line">        imageView.animate().rotationY(180);</span><br><span class="line">        break;</span><br><span class="line">    case 5:</span><br><span class="line">        imageView.animate().rotationY(0);</span><br><span class="line">        break;</span><br><span class="line">    default:</span><br><span class="line">        break;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>5.PropertyValueHolder</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">PropertyValuesHolder holder1 = PropertyValuesHolder.ofFloat(&quot;translationX&quot;, dpToPixel(100));</span><br><span class="line">PropertyValuesHolder holder2 = PropertyValuesHolder.ofFloat(&quot;alpha&quot;, 1.0f);</span><br><span class="line">PropertyValuesHolder holder3 = PropertyValuesHolder.ofFloat(&quot;rotation&quot;, 360);</span><br><span class="line"></span><br><span class="line">ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(imageView, holder1, holder2, holder3);</span><br><span class="line">animator.setDuration(500)</span><br><span class="line">        .start();</span><br></pre></td></tr></table></figure>
+<p>6.AnimatorSet</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">if (state == 0) &#123;</span><br><span class="line">    ObjectAnimator animator1 = ObjectAnimator.ofFloat(imageView, &quot;translationX&quot;, dpToPixel(100));</span><br><span class="line">    ObjectAnimator animator2 = ObjectAnimator.ofFloat(imageView, &quot;rotation&quot;, 360);</span><br><span class="line">    ObjectAnimator animator3 = ObjectAnimator.ofFloat(imageView, &quot;alpha&quot;, 0);</span><br><span class="line"></span><br><span class="line">    AnimatorSet animatorSet = new AnimatorSet();</span><br><span class="line">    //animatorSet.playTogether(animator1, animator2, animator3);</span><br><span class="line">    animatorSet.playSequentially(animator1, animator2, animator3);</span><br><span class="line">    animatorSet.start();</span><br><span class="line"></span><br><span class="line">    state = 1;</span><br><span class="line">&#125; else &#123;</span><br><span class="line">    ObjectAnimator animator1 = ObjectAnimator.ofFloat(imageView, &quot;translationX&quot;, 0);</span><br><span class="line">    ObjectAnimator animator2 = ObjectAnimator.ofFloat(imageView, &quot;rotation&quot;, 0);</span><br><span class="line">    ObjectAnimator animator3 = ObjectAnimator.ofFloat(imageView, &quot;alpha&quot;, 1);</span><br><span class="line"></span><br><span class="line">    AnimatorSet animatorSet = new AnimatorSet();</span><br><span class="line">    animatorSet.playTogether(animator1, animator2, animator3);</span><br><span class="line">    animatorSet.start();</span><br><span class="line"></span><br><span class="line">    state = 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="III-转场动画"><a href="#III-转场动画" class="headerlink" title="III.转场动画"></a>III.转场动画</h2><p>在Android5.0以前，要个Activity的切换添加一些动画，可以这么干。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">startActivity(new Intent(this, TransitionActivity.class));</span><br><span class="line">overridePendingTransition(R.anim.activity_enter_anim, R.anim.activity_exit_anim);</span><br></pre></td></tr></table></figure>
+<p>activity_enter_anim.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;set xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    android:duration=&quot;500&quot;&gt;</span><br><span class="line">    &lt;translate</span><br><span class="line">        android:fromXDelta=&quot;100%&quot;</span><br><span class="line">        android:toXDelta=&quot;0&quot; /&gt;</span><br><span class="line"></span><br><span class="line">&lt;/set&gt;</span><br></pre></td></tr></table></figure>
+<p>activity_exit_anim.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;set xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    android:duration=&quot;500&quot;&gt;</span><br><span class="line">    &lt;translate</span><br><span class="line">        android:fromXDelta=&quot;0&quot;</span><br><span class="line">        android:toXDelta=&quot;-100%&quot; /&gt;</span><br><span class="line">&lt;/set&gt;</span><br></pre></td></tr></table></figure>
+
+<p>但是这种动画只是对整个Activity生效，并不能针对Activity布局里的具体View。Android5.0增加的转场动画，可以有效处理这个问题。</p>
+<p>1.source Activity<br>1.1 Activity java code</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">public void explode(View view) &#123;</span><br><span class="line">    Intent intent = new Intent(this, TransitionsActivity.class);</span><br><span class="line">    intent.putExtra(&quot;flag&quot;, 0);</span><br><span class="line">    if (SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</span><br><span class="line">        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public void slide(View view) &#123;</span><br><span class="line">    Intent intent = new Intent(this, TransitionsActivity.class);</span><br><span class="line">    intent.putExtra(&quot;flag&quot;, 1);</span><br><span class="line">    if (SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</span><br><span class="line">        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public void fade(View view) &#123;</span><br><span class="line">    Intent intent = new Intent(this, TransitionsActivity.class);</span><br><span class="line">    intent.putExtra(&quot;flag&quot;, 2);</span><br><span class="line">    if (SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</span><br><span class="line">        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public void share(View view) &#123;</span><br><span class="line">    View fab = findViewById(R.id.btnFab);</span><br><span class="line">    Intent intent = new Intent(this, TransitionsActivity.class);</span><br><span class="line">    intent.putExtra(&quot;flag&quot;, 3);</span><br><span class="line">    if (SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</span><br><span class="line">        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this,</span><br><span class="line">                Pair.create(view, &quot;share&quot;),</span><br><span class="line">                Pair.create(fab, &quot;fab&quot;)).toBundle());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>1.2 activity layout</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;android.support.constraint.ConstraintLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;</span><br><span class="line">    xmlns:tools=&quot;http://schemas.android.com/tools&quot;</span><br><span class="line">    android:layout_width=&quot;match_parent&quot;</span><br><span class="line">    android:layout_height=&quot;match_parent&quot;</span><br><span class="line">    tools:context=&quot;com.jdqm.animationdemo.transition.TransitionActivity&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;Button</span><br><span class="line">        android:id=&quot;@+id/btnExplode&quot;</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;100dp&quot;</span><br><span class="line">        android:onClick=&quot;explode&quot;</span><br><span class="line">        android:text=&quot;explode&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;Button</span><br><span class="line">        android:id=&quot;@+id/btnSlide&quot;</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;100dp&quot;</span><br><span class="line">        android:onClick=&quot;slide&quot;</span><br><span class="line">        android:text=&quot;slide&quot;</span><br><span class="line">        app:layout_constraintTop_toBottomOf=&quot;@id/btnExplode&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;Button</span><br><span class="line">        android:id=&quot;@+id/btnFade&quot;</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;100dp&quot;</span><br><span class="line">        android:onClick=&quot;fade&quot;</span><br><span class="line">        android:text=&quot;fade&quot;</span><br><span class="line">        app:layout_constraintTop_toBottomOf=&quot;@id/btnSlide&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;Button</span><br><span class="line">        android:id=&quot;@+id/btnShare&quot;</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;100dp&quot;</span><br><span class="line">        android:onClick=&quot;share&quot;</span><br><span class="line">        android:text=&quot;share&quot;</span><br><span class="line">        android:transitionName=&quot;share&quot;</span><br><span class="line">        app:layout_constraintTop_toBottomOf=&quot;@id/btnFade&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;Button</span><br><span class="line">        android:id=&quot;@+id/btnFab&quot;</span><br><span class="line">        android:layout_width=&quot;56dp&quot;</span><br><span class="line">        android:layout_height=&quot;56dp&quot;</span><br><span class="line">        android:background=&quot;@drawable/ripple_round&quot;</span><br><span class="line">        android:elevation=&quot;5dp&quot;</span><br><span class="line">        android:transitionName=&quot;fab&quot;</span><br><span class="line">        app:layout_constraintTop_toBottomOf=&quot;@id/btnShare&quot; /&gt;</span><br><span class="line"></span><br><span class="line">&lt;/android.support.constraint.ConstraintLayout&gt;</span><br></pre></td></tr></table></figure>
+
+<p>1.3 ripple_round.xml </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    android:shape=&quot;rectangle&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;solid android:color=&quot;@android:color/holo_green_dark&quot;/&gt;</span><br><span class="line">    &lt;corners android:radius=&quot;28dp&quot;/&gt;</span><br><span class="line"></span><br><span class="line">&lt;/shape&gt;</span><br></pre></td></tr></table></figure>
+
+
+<p>2.target Activity<br>2.1 Activity Java code</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">public class TransitionsActivity extends AppCompatActivity &#123;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line">        super.onCreate(savedInstanceState);</span><br><span class="line">        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);</span><br><span class="line">        int flag = getIntent().getExtras().getInt(&quot;flag&quot;);</span><br><span class="line">        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</span><br><span class="line">            switch (flag) &#123;</span><br><span class="line">                case 0:</span><br><span class="line">                    getWindow().setEnterTransition(new Explode());</span><br><span class="line">                    break;</span><br><span class="line">                case 1:</span><br><span class="line">                    getWindow().setEnterTransition(new Slide());</span><br><span class="line">                    break;</span><br><span class="line">                case 2:</span><br><span class="line">                    getWindow().setEnterTransition(new Fade());</span><br><span class="line">                    getWindow().setExitTransition(new Fade());</span><br><span class="line">                    break;</span><br><span class="line">                case 3:</span><br><span class="line">                    break;</span><br><span class="line">                default:</span><br><span class="line">                    break;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        setContentView(R.layout.activity_transitions);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.2 activity_layout</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;RelativeLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    xmlns:tools=&quot;http://schemas.android.com/tools&quot;</span><br><span class="line">    android:layout_width=&quot;match_parent&quot;</span><br><span class="line">    android:layout_height=&quot;match_parent&quot;</span><br><span class="line">    android:orientation=&quot;vertical&quot;</span><br><span class="line">    tools:context=&quot;com.jdqm.animationdemo.transition.TransitionsActivity&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;View</span><br><span class="line">        android:id=&quot;@+id/holderView&quot;</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;300dp&quot;</span><br><span class="line">        android:background=&quot;@color/colorAccent&quot;</span><br><span class="line">        android:transitionName=&quot;share&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;Button</span><br><span class="line">        android:id=&quot;@+id/btnFab&quot;</span><br><span class="line">        android:layout_width=&quot;56dp&quot;</span><br><span class="line">        android:layout_height=&quot;56dp&quot;</span><br><span class="line">        android:layout_alignParentEnd=&quot;true&quot;</span><br><span class="line">        android:layout_below=&quot;@id/holderView&quot;</span><br><span class="line">        android:layout_marginEnd=&quot;10dp&quot;</span><br><span class="line">        android:layout_marginTop=&quot;-26dp&quot;</span><br><span class="line">        android:background=&quot;@drawable/ripple_round&quot;</span><br><span class="line">        android:elevation=&quot;5dp&quot;</span><br><span class="line">        android:transitionName=&quot;fab&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;RelativeLayout</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;match_parent&quot;</span><br><span class="line">        android:layout_below=&quot;@id/holderView&quot;</span><br><span class="line">        android:layout_marginTop=&quot;10dp&quot;&gt;</span><br><span class="line"></span><br><span class="line">        &lt;Button</span><br><span class="line">            android:id=&quot;@+id/button&quot;</span><br><span class="line">            android:layout_width=&quot;match_parent&quot;</span><br><span class="line">            android:layout_height=&quot;60dp&quot;</span><br><span class="line">            android:layout_below=&quot;@+id/button4&quot; /&gt;</span><br><span class="line"></span><br><span class="line">        &lt;Button</span><br><span class="line">            android:id=&quot;@+id/button4&quot;</span><br><span class="line">            android:layout_width=&quot;match_parent&quot;</span><br><span class="line">            android:layout_height=&quot;60dp&quot;</span><br><span class="line">            android:layout_alignParentStart=&quot;true&quot;</span><br><span class="line">            android:layout_marginTop=&quot;10dp&quot; /&gt;</span><br><span class="line">    &lt;/RelativeLayout&gt;</span><br><span class="line">&lt;/RelativeLayout&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="IV-总结"><a href="#IV-总结" class="headerlink" title="IV.总结"></a>IV.总结</h2><p>动画的实现原理，其实就是通过不断的改变视图的位置并进行重新绘制，难的是如何计算出下一帧的位置、大小等信息，而动画框架则是帮我们完成了这些个杂的计算过程，详情可了解一下动画的插值器Interpolator。</p>
+<p>对于以上所提到View动画、属性动画以及转出动画，在给出的Demo中都有完整的示例。需要注意的是，View动画只是对View的影像做了变换，但其实际事件响应坐标等还是在原来的位置，而属性动画则解决了这个问题。<br>谢谢大家！</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android/" rel="tag"># Android</a>
+              <a href="/tags/Animation/" rel="tag"># Animation</a>
+              <a href="/tags/%E5%8A%A8%E7%94%BB/" rel="tag"># 动画</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/04/29/Okhttp3-architecture/" rel="prev" title="Okhttp3架构分析">
+                  <i class="fa fa-chevron-left"></i> Okhttp3架构分析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/05/06/as-cache-error/" rel="next" title="Android Studio 里的Cannot resolve symbol XXX">
+                  Android Studio 里的Cannot resolve symbol XXX <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

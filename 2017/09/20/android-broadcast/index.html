@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.0.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jdqm.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+  <meta name="description" content="Android App可以接收来自系统和其他App的广播消息，也可以向它们发送广播消息，比较类似于“发布-订阅”的设计模式，本文主要介绍广播的类型，如何注册广播，如果发送广播以及使用广播需要注意的一些事儿。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Android广播那些事儿">
+<meta property="og:url" content="https://jdqm.github.io/2017/09/20/android-broadcast/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="Android App可以接收来自系统和其他App的广播消息，也可以向它们发送广播消息，比较类似于“发布-订阅”的设计模式，本文主要介绍广播的类型，如何注册广播，如果发送广播以及使用广播需要注意的一些事儿。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-09-20T14:30:24.000Z">
+<meta property="article:modified_time" content="2017-09-20T14:30:24.000Z">
+<meta property="article:author" content="Jdqm">
+<meta property="article:tag" content="-broadcast">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://jdqm.github.io/2017/09/20/android-broadcast/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://jdqm.github.io/2017/09/20/android-broadcast/","path":"2017/09/20/android-broadcast/","title":"Android广播那些事儿"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Android广播那些事儿 | Jdqm Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Jdqm Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">正直、善良、脚踏实地</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#I-%E5%B9%BF%E6%92%AD%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">1.</span> <span class="nav-text">I. 广播的分类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#II-%E6%B3%A8%E5%86%8C%E5%B9%BF%E6%92%AD"><span class="nav-number">2.</span> <span class="nav-text">II. 注册广播</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#III-%E5%8F%91%E9%80%81%E5%B9%BF%E6%92%AD"><span class="nav-number">3.</span> <span class="nav-text">III. 发送广播</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IV-%E6%8E%A5%E6%94%B6%E9%A1%BA%E5%BA%8F"><span class="nav-number">4.</span> <span class="nav-text">IV. 接收顺序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IV-%E5%AE%89%E5%85%A8%E6%80%A7%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="nav-number">5.</span> <span class="nav-text">IV. 安全性与最佳实践</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#V-%E5%85%B6%E4%BB%96"><span class="nav-number">6.</span> <span class="nav-text">V. 其他</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Jdqm</p>
+  <div class="site-description" itemprop="description">I promise you.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://jdqm.github.io/2017/09/20/android-broadcast/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="I promise you.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Android广播那些事儿
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2017-09-20 22:30:24" itemprop="dateCreated datePublished" datetime="2017-09-20T22:30:24+08:00">2017-09-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>Android App可以接收来自系统和其他App的广播消息，也可以向它们发送广播消息，比较类似于“发布-订阅”的设计模式，本文主要介绍广播的类型，如何注册广播，如果发送广播以及使用广播需要注意的一些事儿。</p>
+<span id="more"></span>
+<h1 id="I-广播的分类"><a href="#I-广播的分类" class="headerlink" title="I. 广播的分类"></a>I. 广播的分类</h1><ol>
+<li><p>无序广播<br>没有顺序的广播，广播的接收方没有严格的顺序可言，不可中断。</p>
+</li>
+<li><p>有序广播<br>在注册时可指定优先级，优先级高的广播接收者优先收到广播，优先级以一个整数来标识，数值越大优先级越高。可中断，可再修饰。</p>
+</li>
+<li><p>粘滞广播<br>发出的广播会滞留，注册时间可晚于发送时间，其他功能与无序广播相同。</p>
+</li>
+</ol>
+<h1 id="II-注册广播"><a href="#II-注册广播" class="headerlink" title="II. 注册广播"></a>II. 注册广播</h1><p>我们编写一个广播接收者，通常是继承BroadcastReceiver并重写onReceive(Context,Intent)方法。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class MyReceiver extends BroadcastReceiver &#123;</span><br><span class="line">    </span><br><span class="line">    private static final String TAG = &quot;MyReceiver&quot;;</span><br><span class="line">    </span><br><span class="line">    @Override</span><br><span class="line">    public void onReceive(Context context, Intent intent) &#123;</span><br><span class="line">        // TODO: 通常不能超过10s，否则会报ANR异常，这个方法运行在主线程下</span><br><span class="line">        String action = intent.getAction();</span><br><span class="line">        Log.d(TAG, &quot;onReceive: &quot; + action);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编写完广播接收者后，就需要进行注册（订阅），告诉系统这个广播接收者对哪些广播感兴趣。注册的方式有静态注册和动态注册两种：</p>
+<ul>
+<li>在AndroidManifest.xml文件中声明（静态注册）</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;receiver android:name=&quot;.MyReceiver&quot;&gt;</span><br><span class="line">    &lt;intent-filter&gt;</span><br><span class="line">        &lt;action android:name=&quot;android.intent.action.BOOT_COMPLETED&quot;/&gt;</span><br><span class="line">        &lt;action android:name=&quot;jdqm.intent.action.TEST&quot;/&gt;</span><br><span class="line">    &lt;/intent-filter&gt;</span><br><span class="line">&lt;/receiver&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>通过Java代码注册（动态注册）</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">IntentFilter intentFilter = new IntentFilter();</span><br><span class="line">intentFilter.addAction(&quot;android.intent.action.BOOT_COMPLETED&quot;);</span><br><span class="line">intentFilter.addAction(&quot;jdqm.intent.action.TEST&quot;);</span><br><span class="line">registerReceiver(myReceiver, intentFilter);</span><br></pre></td></tr></table></figure>
+<p>通过动态注册的广播接收者，在宿主（注册时所使用的Context）的生命周期期间都是有效的。当然你也可以在适当的时间调用unregisterReceiver(BroadcastReceiver)来解除注册，这个“适当”取决于具体的业务需求。例如使用Activity的Context在onCreate(Bundle) 中注册的一个广播接收者，可以在onDestory()方法回调时解除注册来防止广播接收者泄漏。原则：不重复注册，不泄露。</p>
+<p>以上注册的广播接收者对 android.intent.action.BOOT_COMPLETED 和 jdqm.intent.action.TEST 这两种action的广播感兴趣，后者是自定义的广播，前者是开机完成时由系统发出（通常自启动的应用会注册这个广播），但注册这个广播须要以下权限:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;uses-permission android:name=&quot;android.permission.RECEIVE_BOOT_COMPLETED&quot;/&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="III-发送广播"><a href="#III-发送广播" class="headerlink" title="III. 发送广播"></a>III. 发送广播</h1><ol>
+<li><p>发送无序广播</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = new Intent(&quot;jdqm.intent.action.TEST&quot;);</span><br><span class="line">sendBroadcast(intent);</span><br></pre></td></tr></table></figure></li>
+<li><p>发送有序广播</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = new Intent(&quot;jdqm.intent.action.TEST&quot;);</span><br><span class="line">//第二个参数时权限</span><br><span class="line">sendOrderedBroadcast(intent, null);</span><br></pre></td></tr></table></figure></li>
+<li><p>发送本地广播</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = new Intent(&quot;jdqm.intent.action.TEST&quot;);</span><br><span class="line">LocalBroadcastManager.getInstance(this).sendBroadcast(intent);</span><br></pre></td></tr></table></figure>
+<p>本地广播只有本应用内通过LocalBroadcastManager.getInstance(this).registerReceiver方法注册的广播接收者能收到，具有更高的安全性，效率也更高（不用跨进程通信）。</p>
+</li>
+<li><p>发送粘滞广播</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = new Intent(&quot;jdqm.intent.action.TEST&quot;);</span><br><span class="line">sendStickyBroadcast(intent);</span><br></pre></td></tr></table></figure>
+<p>这种类型广播在Android6.0中已经被标记被过时， 它有不安全(任何App都能访问), 没有保护 (任何App都能修改)等问题。另外发送这种广播需要以下权限</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;uses-permission android:name=&quot;android.permission.BROADCAST_STICKY&quot;/&gt;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="IV-接收顺序"><a href="#IV-接收顺序" class="headerlink" title="IV. 接收顺序"></a>IV. 接收顺序</h1><p>1.对于无序广播，动态注册的广播接收者会先收到，可以从源码中得到理论支撑。在BroadcastQueue类中有两个集合</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">//存储所有动态注册的无序广播接受者</span><br><span class="line">final ArrayList&lt;BroadcastRecord&gt; mParallelBroadcasts = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">//存储所有静态注册和动态注册的有序广播接收者</span><br><span class="line">final ArrayList&lt;BroadcastRecord&gt; mOrderedBroadcasts = new ArrayList&lt;&gt;();</span><br></pre></td></tr></table></figure>
+<p>然后在其processNextBroadcast(boolean fromMsg)方法中，首先是处理了mParallelBroadcasts集合。<br>2.对于有序广播，优先级高的接受者先收到，如果优先级相同，顺序就是不确定的。先收到的接收者可以调用abortBroadcast()来中断此广播，后续优先级较低的接受者将无法收到。除了中断还可以调用setResultXxx()方法来往广播添加数据，后续的接收者可以读取这些数据。</p>
+<h1 id="IV-安全性与最佳实践"><a href="#IV-安全性与最佳实践" class="headerlink" title="IV. 安全性与最佳实践"></a>IV. 安全性与最佳实践</h1><p>1.如果你的广播不需要发送给本应用以外的组件，使用LocalBroadcastManager来发送广播，这样安全性和效率都比较高<br>2.静态注册有可能造成大量的App启动，这将会影响系统的性能，所以尽量使用动态注册来替代静态注册。这一点Android系统就做出了很好的示范，比如 CONNECTIVITY_ACTION 这个广播只发送给动态注册的广播接收者。 </p>
+<p>3.不在广播的Intent中包含敏感的信息，因为只要注册了这个广播就能读取到这些信息。你可以通过以下3中方式来获得一定的安全性。</p>
+<ul>
+<li>通过使用权限来发送广播，这样只有声明了该权限的应用才能收到广播。但是你很难确保你的权限不被泄漏。</li>
+<li>Android4.0及以上版本，在发送广播的时候可以通过setPackage来指定package（可以指定多个），这样只有匹配的package能接受到。</li>
+<li>使用LocalBroadcastManager来发送本地广播。</li>
+</ul>
+<p>4.当你注册了一个广播，意味着任何App都可以给你发送广播，以下有三点可以限制接收者：</p>
+<ul>
+<li>注册的时候增加权限。</li>
+<li>在AndroidManifest.xml注册receivers时，将android:exported属性设为false。</li>
+<li>使用LocalBroadcastManager来注册。</li>
+</ul>
+<p>5.action的命名空间是全局的，这意味着action有可能会与其他App冲突，所以最好是有一个自己的命名空间。</p>
+<p>6.因为广播接收者是运行在主线程，它应该快速地被执行并且return，所以不要在onReveive方法中做比较耗时的操作。<br>7.不要在广播接收者中启动activitys，这违背了用户的使用习惯，特别是不止一个接收者时。这种情况下可以考虑展示一个notification来替代。</p>
+<h1 id="V-其他"><a href="#V-其他" class="headerlink" title="V. 其他"></a>V. 其他</h1><p>1.系统广播的action的完整列表在Android SDK下的 BROADCAST_ACTIONS.TXT，路径为: Android&#x2F;sdk&#x2F;platforms&#x2F;android-26&#x2F;data&#x2F;BROADCAST_ACTIONS.TXT</p>
+<p>2.Android3.1开始，系统的package manager将记录处于停止状态的应用。默认情况下，静态注册了广播的处于“停止”状态的应用，是不会被启动的，即不会收到广播。当然你也可以为Intent指定flag来该变这个行为：</p>
+<ul>
+<li>FLAG_INCLUDE_STOPPED_PACKAGES：包含处于“停止”转态的应用；</li>
+<li>FLAG_EXCLUDE_STOPPED_PACKAGES：不包含处于“停止”转态的应用；</li>
+</ul>
+<p>如果Intent不包含（或都包含）这两个flag，则表现形式是包含处于“停止”转态的应用，但是系统默认添加了FLAG_EXCLUDE_STOPPED_PACKAGES这个flag，这一点在源码中有所体现：</p>
+<p>ActivityManagerService#broadcastIntentLocked</p>
+<pre><code>final int broadcastIntentLocked(ProcessRecord callerApp,
+    String callerPackage, Intent intent, String resolvedType,
+    IIntentReceiver resultTo, int resultCode, String resultData,
+    Bundle resultExtras, String[] requiredPermissions, int appOp, Bundle bOptions,
+    boolean ordered, boolean sticky, int callingPid, int callingUid, int userId) &#123;
+    
+    intent = new Intent(intent);
+
+    // By default broadcasts do not go to stopped apps.
+    intent.addFlags(Intent.FLAG_EXCLUDE_STOPPED_PACKAGES);
+    ...
+&#125;
+</code></pre>
+<p>这就意味着如果你想启动处于“停止”状态的应用，必须添加FLAG_INCLUDE_STOPPED_PACKAGES这个flag。那么一个应用在什么情况下会处于停止状态？①应用首次安装并且没有启动过；②被人为地强制停止。开机完成的广播就是FLAG_EXCLUDE_STOPPED_PACKAGES这种类型的Intent，这意味着如果你的应用被停止了，开机自启就会失效。下一篇文章将从源码的角度来分析广播的工作流程。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/broadcast/" rel="tag"># -broadcast</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/09/10/android-ttf/" rel="prev" title="Android自定义字体">
+                  <i class="fa fa-chevron-left"></i> Android自定义字体
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/09/26/broadcast-analysis/" rel="next" title="Android广播工作过程分析">
+                  Android广播工作过程分析 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

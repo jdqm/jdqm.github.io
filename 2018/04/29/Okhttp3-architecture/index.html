@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.0.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jdqm.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+  <meta name="description" content="在OkHttp3中，其灵活性很大程度上体现在，可以intercept其任意一个环节，而这个优势便是okhttp3整个请求响应架构体系的精髓所在:">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Okhttp3架构分析">
+<meta property="og:url" content="https://jdqm.github.io/2018/04/29/Okhttp3-architecture/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="在OkHttp3中，其灵活性很大程度上体现在，可以intercept其任意一个环节，而这个优势便是okhttp3整个请求响应架构体系的精髓所在:">
+<meta property="og:locale">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3631399-0626631d246373a4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3631399-164b722ab35ae9bf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3631399-23b0a64a1e0debf0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3631399-c204b3416d3f8ac8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="article:published_time" content="2018-04-29T08:52:40.000Z">
+<meta property="article:modified_time" content="2018-04-29T08:52:40.000Z">
+<meta property="article:author" content="Jdqm">
+<meta property="article:tag" content="-架构分析">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/3631399-0626631d246373a4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+<link rel="canonical" href="https://jdqm.github.io/2018/04/29/Okhttp3-architecture/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://jdqm.github.io/2018/04/29/Okhttp3-architecture/","path":"2018/04/29/Okhttp3-architecture/","title":"Okhttp3架构分析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Okhttp3架构分析 | Jdqm Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Jdqm Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">正直、善良、脚踏实地</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#OkHttp3%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0"><span class="nav-number">1.</span> <span class="nav-text">OkHttp3中的线程池</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%BC%82%E6%AD%A5%E8%AF%B7%E6%B1%82%E7%BA%BF%E7%A8%8B%E6%B1%A0-OkHttp-Dispatcher"><span class="nav-number">2.</span> <span class="nav-text">1.异步请求线程池-OkHttp Dispatcher</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%BF%9E%E6%8E%A5%E6%B1%A0%E6%B8%85%E7%90%86%E7%BA%BF%E7%A8%8B%E6%B1%A0-OkHttp-ConnectionPool"><span class="nav-number">3.</span> <span class="nav-text">2.连接池清理线程池-OkHttp ConnectionPool</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%BC%93%E5%AD%98%E6%95%B4%E7%90%86%E7%BA%BF%E7%A8%8B%E6%B1%A0-OkHttp-DiskLruCache"><span class="nav-number">4.</span> <span class="nav-text">3. 缓存整理线程池-OkHttp DiskLruCache</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-HTTP2%E5%BC%82%E6%AD%A5%E4%BA%8B%E5%8A%A1%E7%BA%BF%E7%A8%8B%E6%B1%A0-OkHttp-Http2Connection"><span class="nav-number">5.</span> <span class="nav-text">4. HTTP2异步事务线程池-OkHttp Http2Connection</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Jdqm</p>
+  <div class="site-description" itemprop="description">I promise you.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://jdqm.github.io/2018/04/29/Okhttp3-architecture/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="I promise you.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Okhttp3架构分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-04-29 16:52:40" itemprop="dateCreated datePublished" datetime="2018-04-29T16:52:40+08:00">2018-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/OpenSource/" itemprop="url" rel="index"><span itemprop="name">OpenSource</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>在OkHttp3中，其灵活性很大程度上体现在，可以intercept其任意一个环节，而这个优势便是okhttp3整个请求响应架构体系的精髓所在:<br><img src="https://upload-images.jianshu.io/upload_images/3631399-0626631d246373a4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Okhttp请求流程"></p>
+<span id="more"></span>
+<ul>
+<li>在OkHttp3中，每一个请求任务都封装为一个Call，其实现为RealCall。</li>
+<li>而所有的策略几乎都可以通过OkHttpClient传入</li>
+<li>所有全局策略与数据，除了存储在允许上层访问的OkHttpClient实例以外，还有一部分是存储在只允许包可见的Internal.instance中（如连接池、路由黑名单等)</li>
+<li>OkHttp中用户可传入的interceptor分为两类，一类是全局interceptor，该类interceptor在请求开始之前最早被调用，另外一类为非网页请求的networkInterceptor，这类interceptor只有在非网页请求中会被调用，并且是在组装完成请求之后，真正发起请求之前被调用(这块具体可以参看RealCall#getResponseWithInterceptorChain()方法)</li>
+<li>整个请求过程通过RealInterceptorChain#proceed来连接，在每个interceptor中调用下一个interceptor来完成整个请求流程，并且在回到当前interceptor后完成响应处理</li>
+<li>在异步请求中，我们通过Callback来获得简单清晰的请求回调(onFailure、onResponse)</li>
+<li>在OkHttpClient中，我们可以传入EventListener的工厂方法，为每一个请求创建一个EventListener，来接收非常细的事件回调</li>
+</ul>
+<p><img src="https://upload-images.jianshu.io/upload_images/3631399-164b722ab35ae9bf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="完整interceptor-chain"></p>
+<h2 id="OkHttp3中的线程池"><a href="#OkHttp3中的线程池" class="headerlink" title="OkHttp3中的线程池"></a>OkHttp3中的线程池</h2><p>OkHttp 中的对所有的任务采用 NamedRunnable，约束每个执行单元给出对应的业务名称，以便于线程维护。</p>
+<h2 id="1-异步请求线程池-OkHttp-Dispatcher"><a href="#1-异步请求线程池-OkHttp-Dispatcher" class="headerlink" title="1.异步请求线程池-OkHttp Dispatcher"></a>1.异步请求线程池-OkHttp Dispatcher</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public synchronized ExecutorService executorService() &#123;</span><br><span class="line">  if (executorService == null) &#123;</span><br><span class="line">    executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, TimeUnit.SECONDS,</span><br><span class="line">        new SynchronousQueue&lt;Runnable&gt;(), Util.threadFactory(&quot;OkHttp Dispatcher&quot;, false));</span><br><span class="line">  &#125;</span><br><span class="line">  return executorService;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>该线程池与Android下的 Executors.newCachedThreadPool() 比较类似；</li>
+<li>无任务上限，自动回收闲置60s的线程，适用于大量耗时较短的任务；</li>
+<li>虽然线程池无任务上限，但是Dispatcher对入口enqueue()进行了把关，最大的异步任务数默认是64，同一个主机默认是5，当然这两个默认值是可以修改的，Dispatcher提供的修改接口；</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">okHttpClient.dispatcher().setMaxRequests(128);</span><br><span class="line">okHttpClient.dispatcher().setMaxRequestsPerHost(10);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>通过两个双端队列来维护准备执行的任务和正在执行的任务：Deque<AsyncCall> readyAsyncCalls, Deque<AsyncCall> runningAsyncCalls；</p>
+</li>
+<li><p>在每个任务结束时，都会检查 readyAsyncCalls 是否有任务，在条件满足的情况下，按照先进先出的原则将任务移动到 runningAsyncCalls中，并在线程池中执行；</p>
+</li>
+</ul>
+<p><img src="https://upload-images.jianshu.io/upload_images/3631399-23b0a64a1e0debf0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="异步请求线程池"></p>
+<h2 id="2-连接池清理线程池-OkHttp-ConnectionPool"><a href="#2-连接池清理线程池-OkHttp-ConnectionPool" class="headerlink" title="2.连接池清理线程池-OkHttp ConnectionPool"></a>2.连接池清理线程池-OkHttp ConnectionPool</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">* Background threads are used to cleanup expired connections. There will be at most a single</span><br><span class="line">* thread running per connection pool. The thread pool executor permits the pool itself to be</span><br><span class="line">* garbage collected.</span><br><span class="line">*/</span><br><span class="line">private static final Executor executor = new ThreadPoolExecutor(0 /* corePoolSize */,</span><br><span class="line">    Integer.MAX_VALUE /* maximumPoolSize */, 60L /* keepAliveTime */, TimeUnit.SECONDS,</span><br><span class="line">    new SynchronousQueue&lt;Runnable&gt;(), Util.threadFactory(&quot;OkHttp ConnectionPool&quot;, true));</span><br></pre></td></tr></table></figure>
+<ul>
+<li>该线程池用来清理长时间闲置的和泄漏的连接；</li>
+<li>该线程池本身无任务上限，线程闲置60s自动回收；</li>
+<li>虽然任务无上限，但其通过 cleanupRunning 标记来控制只有一个线程在运行，当连接池中没有连接后才会被重新设置为 false;</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">void put(RealConnection connection) &#123;</span><br><span class="line">    assert (Thread.holdsLock(this));</span><br><span class="line">    if (!cleanupRunning) &#123;</span><br><span class="line">        cleanupRunning = true;</span><br><span class="line">        executor.execute(cleanupRunnable);</span><br><span class="line">    &#125;</span><br><span class="line">    connections.add(connection);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>次工作线程会不断地清理，当清理完一遍后超时连接后，根据当前连接池中最近的下一个空闲超时连接计算出一个阻塞时间并阻塞，直到连接池中没有任何连接才结束，并将 cleanupRunning 设为 false;</p>
+</li>
+<li><p>在每次有连接加入连接池时，如果当前没有清理任务运行，会加入一个清理任务到到线程池中执行;</p>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">void put(RealConnection connection) &#123;</span><br><span class="line">    assert (Thread.holdsLock(this));</span><br><span class="line">    if (!cleanupRunning) &#123;</span><br><span class="line">        cleanupRunning = true;</span><br><span class="line">        executor.execute(cleanupRunnable);</span><br><span class="line">    &#125;</span><br><span class="line">    connections.add(connection);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/3631399-c204b3416d3f8ac8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="连接池清理线程池"></p>
+<h2 id="3-缓存整理线程池-OkHttp-DiskLruCache"><a href="#3-缓存整理线程池-OkHttp-DiskLruCache" class="headerlink" title="3. 缓存整理线程池-OkHttp DiskLruCache"></a>3. 缓存整理线程池-OkHttp DiskLruCache</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// Use a single background thread to evict entries.</span><br><span class="line">Executor executor = new ThreadPoolExecutor(0, 1, 60L, TimeUnit.SECONDS,</span><br><span class="line">    new LinkedBlockingQueue&lt;Runnable&gt;(), Util.threadFactory(&quot;OkHttp DiskLruCache&quot;, true));</span><br></pre></td></tr></table></figure>
+<ul>
+<li>该线程池用于整理本地请求缓存数据；</li>
+<li>缓存的整理包含: 达到阀值大小的文件，删除最近最少使用的记录，在有关操作达到一定数量以后对记录进行重建；</li>
+<li>最大运行线程数1，无需考虑线程安全问题，自动回收闲置60s的线程；</li>
+</ul>
+<h2 id="4-HTTP2异步事务线程池-OkHttp-Http2Connection"><a href="#4-HTTP2异步事务线程池-OkHttp-Http2Connection" class="headerlink" title="4. HTTP2异步事务线程池-OkHttp Http2Connection"></a>4. HTTP2异步事务线程池-OkHttp Http2Connection</h2><ul>
+<li>HTTP2采用了多路复用，因此需要维护连接有效性，本线程池就是用于维护相关的各类HTTP2事务;</li>
+<li>线程池本身无任务上限，自动回收闲置60s的线程;</li>
+<li>每一个HTTP2连接都有这么一个线程池存在;</li>
+</ul>
+<p>相关阅读</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/da4a806e599b">1.Okhttp的基本使用</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/b0353ed71151">2.Okhttp主流程源码分析</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/9deec36f2759">3.Okhttp3架构分析，主要通过一些流程图类展现</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%B6%E6%9E%84%E5%88%86%E6%9E%90/" rel="tag"># -架构分析</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/04/29/Okhttp3-source/" rel="prev" title="Okhttp3源码分析">
+                  <i class="fa fa-chevron-left"></i> Okhttp3源码分析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/05/05/android-animation/" rel="next" title="Android动画总结">
+                  Android动画总结 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

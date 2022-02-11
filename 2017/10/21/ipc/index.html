@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.0.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jdqm.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+  <meta name="description" content="1.IPCInter-Process Communication，即进程间通信或者跨进程通信。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="IPC基础">
+<meta property="og:url" content="https://jdqm.github.io/2017/10/21/ipc/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="1.IPCInter-Process Communication，即进程间通信或者跨进程通信。">
+<meta property="og:locale">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3631399-d86467fc5e140878.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3631399-208b4455ef16bd0e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="article:published_time" content="2017-10-21T04:12:39.000Z">
+<meta property="article:modified_time" content="2017-10-21T04:12:39.000Z">
+<meta property="article:author" content="Jdqm">
+<meta property="article:tag" content="-IPC -跨进程通信">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/3631399-d86467fc5e140878.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+<link rel="canonical" href="https://jdqm.github.io/2017/10/21/ipc/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://jdqm.github.io/2017/10/21/ipc/","path":"2017/10/21/ipc/","title":"IPC基础"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>IPC基础 | Jdqm Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Jdqm Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">正直、善良、脚踏实地</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-IPC"><span class="nav-number">1.</span> <span class="nav-text">1.IPC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">2.进程与线程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E4%BB%80%E4%B9%88%E6%83%85%E5%86%B5%E4%B8%8B%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%A4%9A%E8%BF%9B%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">3.什么情况下会出现多进程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E4%BD%BF%E7%94%A8%E5%A4%9A%E8%BF%9B%E7%A8%8B%E4%BC%9A%E5%B8%A6%E6%9D%A5%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-number">4.</span> <span class="nav-text">4.使用多进程会带来什么问题？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E6%9C%89%E5%93%AA%E4%BA%9B%E6%96%B9%E5%BC%8F%EF%BC%9F"><span class="nav-number">5.</span> <span class="nav-text">5.进程间通信有哪些方式？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-Android%E5%AE%9E%E7%8E%B0%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%BA%8F%E5%88%97%E5%8C%96%E5%92%8C%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">6.</span> <span class="nav-text">6.Android实现对象的序列化和反序列化的两种方式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-Serializable%E4%B8%8EParcelable%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="nav-number">7.</span> <span class="nav-text">7.Serializable与Parcelable有什么区别？</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Jdqm</p>
+  <div class="site-description" itemprop="description">I promise you.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://jdqm.github.io/2017/10/21/ipc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="I promise you.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          IPC基础
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2017-10-21 12:12:39" itemprop="dateCreated datePublished" datetime="2017-10-21T12:12:39+08:00">2017-10-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="1-IPC"><a href="#1-IPC" class="headerlink" title="1.IPC"></a>1.IPC</h1><p>Inter-Process Communication，即进程间通信或者跨进程通信。</p>
+<span id="more"></span>
+
+<h1 id="2-进程与线程"><a href="#2-进程与线程" class="headerlink" title="2.进程与线程"></a>2.进程与线程</h1><p>进程与线程是不同的概念，按照操作系统中的描述，线程是CUP调度的最小单元，而进程一般是指一个执行单元，对于PC和移动设备来说，通常指一个程序或者应用。一个进程可以包含多个线程，即进程与线程是包含与被包含的关系。</p>
+<h1 id="3-什么情况下会出现多进程"><a href="#3-什么情况下会出现多进程" class="headerlink" title="3.什么情况下会出现多进程"></a>3.什么情况下会出现多进程</h1><p>①一个应用存在多进程；②多个应用之间构成多进程。<br>在Android中使用多进程常规的方法只有一种，那就是在注册四大组件时在AndroidManifest.xml中为四大组件声明属性 android:process属性来指定该组件在哪个进程中工作。例如本例中创建了3个Activity，它的AndroidManifest.xml文件如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;manifest xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    package=&quot;com.jdqm.ipcdemo&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;application</span><br><span class="line">        android:allowBackup=&quot;true&quot;</span><br><span class="line">        android:icon=&quot;@mipmap/ic_launcher&quot;</span><br><span class="line">        android:label=&quot;@string/app_name&quot;</span><br><span class="line">        android:roundIcon=&quot;@mipmap/ic_launcher_round&quot;</span><br><span class="line">        android:supportsRtl=&quot;true&quot;</span><br><span class="line">        android:theme=&quot;@style/AppTheme&quot;&gt;</span><br><span class="line">        &lt;activity android:name=&quot;.MainActivity&quot;&gt;</span><br><span class="line">            &lt;intent-filter&gt;</span><br><span class="line">                &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;</span><br><span class="line"></span><br><span class="line">                &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;</span><br><span class="line">            &lt;/intent-filter&gt;</span><br><span class="line">        &lt;/activity&gt;</span><br><span class="line"></span><br><span class="line">        &lt;activity android:name=&quot;.SecondActivity&quot;</span><br><span class="line">            android:process=&quot;:remote&quot; /&gt;</span><br><span class="line"></span><br><span class="line">        &lt;activity android:name=&quot;.ThirdActivity&quot;</span><br><span class="line">            android:process=&quot;com.jdqm.ipcdemo.remote&quot;/&gt;</span><br><span class="line">    &lt;/application&gt;</span><br><span class="line"></span><br><span class="line">&lt;/manifest&gt;</span><br></pre></td></tr></table></figure>
+<p>其中为SecondActivity指定在新的进程 “包名:remote“中工作，ThirdActivity在 “com.jdqm.ipcdemo.remote”进程中工作，启动应用，并依此启动这个三个Activity，通过菜单Tools–&gt;Android–&gt;Android Devices monitor来查看当前设备的工作进程。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3631399-d86467fc5e140878.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Android Devices monitor查看系统进程信息"></p>
+<p>8600、8603、8614这三个进程就是该应用新建的进程。除了以上方式外，我们还可以通过命令行的方式去查看进程信息： adb shell ps | grep com.jdqm.ipcdemo，其中com.jdqm.ipcdemo 是包名。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3631399-208b4455ef16bd0e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="命令行方式查看系统进程信息"></p>
+<p>注：另外还有一种比较特殊的方式去创建多进程，那就是在jni层去fork新的进程。</p>
+<p>在上面的例子中，android:process&#x3D;”:remote”与android:process&#x3D;”com.jdqm.ipcdemo.remote”有什么不同？<br>①前者会在冒号前添加当前应用的包名，即完整进程名为：com.jdqm.ipcdeo:remote；<br>②前者是当前应用的私有进程，其他的应用不能访问，而后者可以通过SharedUID方式与它跑在同一个进程中。</p>
+<h1 id="4-使用多进程会带来什么问题？"><a href="#4-使用多进程会带来什么问题？" class="headerlink" title="4.使用多进程会带来什么问题？"></a>4.使用多进程会带来什么问题？</h1><p>①静态成员和单例模式失效（每个进程有独立的虚拟机）；<br>②线程同步机制失效（既然不是同一块内存，不管是锁对象还是锁全局类都无法保证线程的同步）；<br>④SharedPreferences可靠新下降（并发读写都有可能出现问题）；<br>④Application会多次创建（系统创建一个新的进程，就会分配一个新的虚拟机，这个过程就是应用启动的过程）；</p>
+<h1 id="5-进程间通信有哪些方式？"><a href="#5-进程间通信有哪些方式？" class="headerlink" title="5.进程间通信有哪些方式？"></a>5.进程间通信有哪些方式？</h1><p>Intent传递数据，共享文件和SharedPreferences，基于Binder的Messenger和AIDL以及Socket等。</p>
+<h1 id="6-Android实现对象的序列化和反序列化的两种方式"><a href="#6-Android实现对象的序列化和反序列化的两种方式" class="headerlink" title="6.Android实现对象的序列化和反序列化的两种方式"></a>6.Android实现对象的序列化和反序列化的两种方式</h1><p>①实现erializable接口</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class User implements Serializable &#123;</span><br><span class="line"></span><br><span class="line">    private static final long serialVersionUID = 1L;</span><br><span class="line"></span><br><span class="line">    private String name;</span><br><span class="line">   </span><br><span class="line">    private int age;</span><br><span class="line"></span><br><span class="line">    public User(String name, int age) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">        this.age = age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;User&#123;&quot; +</span><br><span class="line">                &quot;name=&#x27;&quot; + name + &#x27;\&#x27;&#x27; +</span><br><span class="line">                &quot;, age=&quot; + age +</span><br><span class="line">                &#x27;&#125;&#x27;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(&quot;/mnt/sdcard/cache.txt&quot;));</span><br><span class="line">User u = new User(&quot;张三&quot;, 18);</span><br><span class="line">out.writeObject(u);</span><br><span class="line">out.close();</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ObjectInputStream in = new ObjectInputStream(new FileInputStream(&quot;/mnt/sdcard/cache.txt&quot;));</span><br><span class="line"></span><br><span class="line">User u = (User) in.readObject();</span><br><span class="line">in.close();</span><br></pre></td></tr></table></figure>
+<p>通过Serrializable接口实现序列化和反序列化比较简单，只要该类实现Serializable接口即可，那其中的 “private static final long serialVersionUID &#x3D; 1L”指定的这个值有什么用？serialVersionUID 的工作机制是这样的：在序列化时会把这个serialVersionUID写入到序列化文件中（也可能是其他中介），当反序列化时系统会去检查这个值与当前类的serialVersionUID是否相等，若相等则说明序列化时该类的版本与当前的版本是一致的，这个时候是能成功被反序列化的；否则说明当前类的结构发生了某些变换，比如类的成员变量的数量、类型发生了改变，这个时候是无法正常被反序列化的。当然这个值如果不指定的话，系统会根据类的结构计算一个Hash值，一旦这个类发送任何改变都会引起这个值得改变。有时候虽然我们的类发生了改变，但是我们仍可以利用反序列化来恢复原来的数据，这个时候必须要手动声明serialVersionUID。例如：假设序列化的时候类的结构是这样子的:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class Student implements Serializable&#123;</span><br><span class="line"></span><br><span class="line">    private static final long serialVersionUID = 1L;</span><br><span class="line">    </span><br><span class="line">    private String name;</span><br><span class="line">    private int age;</span><br><span class="line"></span><br><span class="line">    public Student(String name, int age) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">        this.age = age;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过序列化写入文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(&quot;/mnt/sdcard/student.txt&quot;));</span><br><span class="line">Student stu = new Student(&quot;小明&quot;, 18);</span><br><span class="line">out.writeObject(stu);</span><br><span class="line">out.close();</span><br></pre></td></tr></table></figure>
+<p>这个时候我们去改变类的结构，增加一个字段 “private float score;”，这个时候类的结构发生了改变，但是我们指定serialVersionUID 不变，“欺骗”系统。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">public class Student implements Serializable&#123;</span><br><span class="line"></span><br><span class="line">    private static final long serialVersionUID = 1L;</span><br><span class="line"></span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    private int age;</span><br><span class="line">   </span><br><span class="line">     private float score;</span><br><span class="line">   </span><br><span class="line">     public Student(String name, int age) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">        this.age = age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;Student&#123;&quot; +</span><br><span class="line">                &quot;name=&#x27;&quot; + name + &#x27;\&#x27;&#x27; +</span><br><span class="line">                &quot;, age=&quot; + age +</span><br><span class="line">                &quot;, score=&quot; + score +</span><br><span class="line">                &#x27;&#125;&#x27;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这种情况下去反序列化</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ObjectInputStream in = new ObjectInputStream(new FileInputStream(&quot;/mnt/sdcard/student.txt&quot;));</span><br><span class="line"></span><br><span class="line">Student stu2 = (Student) in.readObject();</span><br><span class="line">//name=&#x27;小明&#x27;, age=18, score=0.0</span><br><span class="line">Log.d(TAG, &quot;onCreate: &quot; + stu2.toString()); </span><br><span class="line">in.close();</span><br></pre></td></tr></table></figure>
+<p>可以看到原来的两个字段被正确的反序列化，而增加的字段则是一个默认值。假设序列化时的serialVersionUID与反序列化时的不一致，则会报如下异常：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java.io.InvalidClassException: com.jdqm.ipcdemo.Student; Incompatible class (SUID): com.jdqm.ipcdemo.Student: static final long serialVersionUID =1L; but expected com.jdqm.ipcdeom.Student: static final long serialVersionUID =2L;</span><br></pre></td></tr></table></figure>
+
+<p>②Parcelable<br>只要实现这个接口的类的对象就可以通过Intent和Binder来传递。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">public class Person implements Parcelable &#123;</span><br><span class="line"></span><br><span class="line">    private String name;</span><br><span class="line"></span><br><span class="line">    private int age;</span><br><span class="line"></span><br><span class="line">    public Person(String name, int age) &#123;</span><br><span class="line">        this.name = name;</span><br><span class="line">        this.age = age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     *返回当前对象的内容描述</span><br><span class="line">     * @return 0或者1，当含有文件描述符时返回1，其他情况0，几乎所有的情况都是返回0</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    public int describeContents() &#123;</span><br><span class="line">        return 0;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     *</span><br><span class="line">     * @param dest</span><br><span class="line">     * @param flags 这个标记为可以是0或者1，为1时标示当前对象需要作为返回值返回，不能立即释放。几乎所有情况都是0</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    public void writeToParcel(Parcel dest, int flags) &#123;</span><br><span class="line">        dest.writeString(name);</span><br><span class="line">        dest.writeInt(age);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static Parcelable.Creator&lt;Person&gt; CREATOR = new Parcelable.Creator&lt;Person&gt;()&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public Person createFromParcel(Parcel source) &#123;</span><br><span class="line">            return new Person(source);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public Person[] newArray(int size) &#123;</span><br><span class="line">            return new Person[size];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    private Person(Parcel source) &#123;</span><br><span class="line">        name = source.readString();</span><br><span class="line">        age = source.readInt();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;Person&#123;&quot; +</span><br><span class="line">                &quot;name=&#x27;&quot; + name + &#x27;\&#x27;&#x27; +</span><br><span class="line">                &quot;, age=&quot; + age +</span><br><span class="line">                &#x27;&#125;&#x27;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="7-Serializable与Parcelable有什么区别？"><a href="#7-Serializable与Parcelable有什么区别？" class="headerlink" title="7.Serializable与Parcelable有什么区别？"></a>7.Serializable与Parcelable有什么区别？</h1><p>Serializable是java的序列化接口，使用起来简单但是开销大，会伴随着大量的I&#x2F;O操作，而Parcelable是Android中的序列化方式，稍显复杂但是效率更高。Parcelable主要用于内存序列化上，通过Parcelable将对象序列化到存储设备上或者序列化后通过网络传输也是可以的，但是过程会稍显复杂，这两种情况下建议使用Serializable。</p>
+<p>#8.Binder<br>Binder是一个类，实现了IBinder接口。从IPC的角度来说，Binder是Android的一种跨进程通信方式。Binder还可以理解为一种虚拟的物理设备，它的设备驱动是&#x2F;dev&#x2F;binder。</p>
+<p>#9.Binder很重要的两个方法linkToDeath和unlinkToDeath<br>当我们发起RPC的过程中，由于某种原因服务端由于异常终止了，这个时候客户端到服务端的Binder连接就断了，这样就导致远程调用失败，如果我们不知道连接已经断了，那就会影响客户端。为了解决这个问题，Binder提供一配对的方法linkToDeath和unlinkToDeath，通过linkToDeath我们可以给Binder设置死亡代理，当Binder死亡时，就会收到通知，这个时候就可以选择重连或者别的操作。那么问题来了，如何给Binder设置死亡代理？</p>
+<p>1）声明一个DeathRecipient对象</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">private IBinder.DeathRecipient mDeathRecipient = new IBinder.DeathRecipient() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void binderDied() &#123;</span><br><span class="line">        if (bookManager == null) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        Log.d(TAG, &quot;binderDied: &quot;);</span><br><span class="line">        bookManager.asBinder().unlinkToDeath(mDeathRecipient, 0);</span><br><span class="line">        bookManager = null;</span><br><span class="line">        Intent intent = new Intent(MainActivity.this, BookManagerService.class);</span><br><span class="line">        bindService(intent, connection,BIND_AUTO_CREATE);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>2）在客户端绑定服务成功后，给放回的Binder设置死亡代理</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void onServiceConnected(ComponentName name, IBinder service) &#123;</span><br><span class="line">    Log.d(TAG, &quot;onServiceConnected: &quot;);</span><br><span class="line">    bookManager = IBookManage.Stub.asInterface(service);</span><br><span class="line">    try &#123;</span><br><span class="line">        bookManager.getBookList();</span><br><span class="line">    &#125; catch (RemoteException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    try &#123;</span><br><span class="line">        service.linkToDeath(mDeathRecipient, 0);</span><br><span class="line">    &#125; catch (RemoteException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另外，可以通过binder的isBinderAlive方法查看binder时候还“活着”。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/IPC-%E8%B7%A8%E8%BF%9B%E7%A8%8B%E9%80%9A%E4%BF%A1/" rel="tag"># -IPC -跨进程通信</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/09/26/broadcast-analysis/" rel="prev" title="Android广播工作过程分析">
+                  <i class="fa fa-chevron-left"></i> Android广播工作过程分析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/10/21/aidl/" rel="next" title="从一个例子开始分析AIDL原理">
+                  从一个例子开始分析AIDL原理 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.0.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jdqm.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+  <meta name="description" content="一、Activity的生命周期1、正常的生命周期 onCreate()： 表示Activity正在被创建，是生命周期中的第一个方法，可以在这个方法中做一些初始化工作，如调用setContentView()去加载布局资源，初始化Activity所需的数据，当然如果加载的数据比较多或者比较耗时的操作建议采用异步加载的方式，加快界面的出现，待异步加载完成再去设置view的属性。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Android学习笔记(1)">
+<meta property="og:url" content="https://jdqm.github.io/2017/01/31/Android%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="一、Activity的生命周期1、正常的生命周期 onCreate()： 表示Activity正在被创建，是生命周期中的第一个方法，可以在这个方法中做一些初始化工作，如调用setContentView()去加载布局资源，初始化Activity所需的数据，当然如果加载的数据比较多或者比较耗时的操作建议采用异步加载的方式，加快界面的出现，待异步加载完成再去设置view的属性。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-01-31T08:59:47.000Z">
+<meta property="article:modified_time" content="2022-02-11T07:25:13.897Z">
+<meta property="article:author" content="Jdqm">
+<meta property="article:tag" content="Android学习笔记">
+<meta property="article:tag" content="Activity启动模式">
+<meta property="article:tag" content="intent-filter">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://jdqm.github.io/2017/01/31/Android%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://jdqm.github.io/2017/01/31/Android%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1/","path":"2017/01/31/Android学习笔记-1/","title":"Android学习笔记(1)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Android学习笔记(1) | Jdqm Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Jdqm Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">正直、善良、脚踏实地</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81Activity%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">1.</span> <span class="nav-text">一、Activity的生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81%E6%AD%A3%E5%B8%B8%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">1.1.</span> <span class="nav-text">1、正常的生命周期</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81%E5%BC%82%E5%B8%B8%E6%83%85%E5%86%B5%E4%B8%8B%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">1.2.</span> <span class="nav-text">2、异常情况下的生命周期</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E3%80%81Activity%E5%90%AF%E5%8A%A8%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.3.</span> <span class="nav-text">二、Activity启动模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81standard"><span class="nav-number">1.4.</span> <span class="nav-text">1、standard</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81singleTop"><span class="nav-number">1.5.</span> <span class="nav-text">2、singleTop</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%E3%80%81singleTask"><span class="nav-number">1.6.</span> <span class="nav-text">3、singleTask</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4%E3%80%81singleInstance"><span class="nav-number">1.7.</span> <span class="nav-text">4、singleInstance</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81IntentFilter%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99"><span class="nav-number">2.</span> <span class="nav-text">三、IntentFilter的匹配规则</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81action%E7%9A%84%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99"><span class="nav-number">2.1.</span> <span class="nav-text">1、action的匹配规则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81catetory%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99"><span class="nav-number">2.2.</span> <span class="nav-text">2、catetory匹配规则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%E3%80%81data%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99"><span class="nav-number">2.3.</span> <span class="nav-text">3、data匹配规则</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Jdqm</p>
+  <div class="site-description" itemprop="description">I promise you.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://jdqm.github.io/2017/01/31/Android%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="I promise you.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Android学习笔记(1)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2017-01-31 16:59:47" itemprop="dateCreated datePublished" datetime="2017-01-31T16:59:47+08:00">2017-01-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-02-11 15:25:13" itemprop="dateModified" datetime="2022-02-11T15:25:13+08:00">2022-02-11</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h3 id="一、Activity的生命周期"><a href="#一、Activity的生命周期" class="headerlink" title="一、Activity的生命周期"></a>一、Activity的生命周期</h3><h4 id="1、正常的生命周期"><a href="#1、正常的生命周期" class="headerlink" title="1、正常的生命周期"></a>1、正常的生命周期</h4><ul>
+<li><strong>onCreate()：</strong><blockquote>
+<p>表示Activity正在被创建，是生命周期中的第一个方法，可以在这个方法中做一些初始化工作，如调用setContentView()去加载布局资源，初始化Activity所需的数据，当然如果加载的数据比较多或者比较耗时的操作建议采用异步加载的方式，加快界面的出现，待异步加载完成再去设置view的属性。</p>
+</blockquote>
+</li>
+</ul>
+<span id="more"></span>
+
+<ul>
+<li><p><strong>onRestart():</strong></p>
+<blockquote>
+<p>表示Activity正在被重新创建，一般情况下当Activity由stop状态重新变为可见时，onRestart被调用。</p>
+</blockquote>
+</li>
+<li><p><strong>onStart()：</strong></p>
+<blockquote>
+<p>表示Activity正在启动，即将开始，这个时候Activity已经可见，只是还没出现在前台，所以看不见。可见与看见还是有区别的。</p>
+</blockquote>
+</li>
+<li><p><strong>onResume()：</strong></p>
+<blockquote>
+<p>表示Activity已经可见，获取焦点（在前台）可与用户交互了。</p>
+</blockquote>
+</li>
+<li><p><strong>onPause()：</strong></p>
+<blockquote>
+<p>表示Activity正在失去焦点。应用场景：游戏暂停时在该方法保存游戏数据，在onResume中恢复。</p>
+</blockquote>
+</li>
+<li><p><strong>onStop()：</strong></p>
+<blockquote>
+<p>表示Activity正在被停止，这个时候可以做一些稍重量级的操作，同样不能太耗时。</p>
+</blockquote>
+</li>
+<li><p><strong>onDestroy()：</strong></p>
+<blockquote>
+<p>表示Activity即将销毁，是生命周期中最后的一个回调方法，我们可以在这里做一些回收工作和最终的资源释放。</p>
+</blockquote>
+</li>
+<li><p><strong>完整的生命周期</strong>：</p>
+<blockquote>
+<p>onCreate()–&gt;onStart()–&gt;onResume()–&gt;onPause()–&gt;onStop()–&gt;onDestroy()</p>
+</blockquote>
+</li>
+<li><p><strong>可见周期：</strong></p>
+<blockquote>
+<p>onStart()–&gt;onResume()–&gt;onPause()–&gt;onStop()期间</p>
+</blockquote>
+</li>
+<li><p><strong>前台（获得焦点）周期：</strong></p>
+<blockquote>
+<p>onResume()–&gt;onPause()期间</p>
+</blockquote>
+</li>
+<li><p>有一个比较特殊的方法onRestart()会在Activity有不可见变为可见是调用，即当一个Activity处于stop状态时，再次变为可见时：onRestart()–&gt;onStart()–&gt;onResume()</p>
+</li>
+<li><p>当前Activity onPause()之后启动的Activity才能onResume,所以不要再在onPause方法做一些重量级的操作。</p>
+</li>
+</ul>
+<h4 id="2、异常情况下的生命周期"><a href="#2、异常情况下的生命周期" class="headerlink" title="2、异常情况下的生命周期"></a>2、异常情况下的生命周期</h4><blockquote>
+<p>到底什么情况下会出现异常？</p>
+</blockquote>
+<ul>
+<li><p>①资源相关的系统配置发生变化导致Activity被销毁重建，如横竖屏切换（在不处理的情况下会销毁重建）；</p>
+</li>
+<li><p>②系统资源内存不足，导致较低优先级的Activity被暂时回收；</p>
+</li>
+<li><p>这种情况下的生命周期为：</p>
+<blockquote>
+<p>onSaveInstanceState()–&gt;onDestroy()<br>onCreate()–&gt;onRestoreInstanceState()</p>
+</blockquote>
+</li>
+</ul>
+<p>当Activity被异常终止的情况下，在onStop()之前会调用onSaveInstanceState()来保存数据，这些数据会以Bundle的形式传到onCreate()和onRestoreInstanceState(),onRestoreInstanceState()的调用时机在onStart()之后。当Activity被异常终止的时候系统会自动保存一些数据，当然我们有时也需要自己保存一些数据，具体系统会自动保存和恢复哪些数据，这要看看具体的View的onSaveInstanceState()和onRestoreInstanceState()。</p>
+<ul>
+<li>既然在重建时onCreate()和onRestoreInstanceState()都能接受到参数，有什么区别？<blockquote>
+<p>区别是在onCreate(Bundle saveInstanceState)需要判断saveInstanceState是否为null，而onRestoreInstanceState(Bundle saveInstanceState)一旦被调用saveInstanceState就不为null,当然，官方推荐在onRestoreInstanceState()中恢复数据。</p>
+</blockquote>
+<h4 id="二、Activity启动模式"><a href="#二、Activity启动模式" class="headerlink" title="二、Activity启动模式"></a>二、Activity启动模式</h4><h4 id="1、standard"><a href="#1、standard" class="headerlink" title="1、standard"></a>1、standard</h4><blockquote>
+<p>默认的标准模式，每次启动都会创建一个新的实例并置于栈顶，任务栈中可存在多个实例；新启动的Activity属于启动它的Activity所在的任务栈，这就意味着必须通过Activity的Context来启动standard模式的Activity，假设通过ApplicationContext来启动则会抛出异常，因为ApplicationContext并没有所属的任务栈，这个时候可以通过FLAG_ACTIVITY_NEW_TASK标记位来解决这个问题，但是这样实际就是以singleTask模式来启动了。</p>
+</blockquote>
+</li>
+</ul>
+<h4 id="2、singleTop"><a href="#2、singleTop" class="headerlink" title="2、singleTop"></a>2、singleTop</h4><blockquote>
+<p>栈顶服用模式，当栈顶的实例是要启动的Activity的实例时，不会重新初建，但是onNewIntent方法会被调用，可以通过这个方法的参数获得当前请求的信息。</p>
+</blockquote>
+<h4 id="3、singleTask"><a href="#3、singleTask" class="headerlink" title="3、singleTask"></a>3、singleTask</h4><blockquote>
+<p>栈内复用模式，这是一种单实例模式，当请求启动一个该模式的Activity时，①如果所需要的任务栈不存在，创建任务栈，新建实例入栈；②如果任务在存在但无该Activity实例，新建实例入栈；③如果任务栈存在，实例也存在，clearTop,将该实例之上的实例全部出栈，让该实例暴露在栈顶。</p>
+</blockquote>
+<h4 id="4、singleInstance"><a href="#4、singleInstance" class="headerlink" title="4、singleInstance"></a>4、singleInstance</h4><blockquote>
+<p>单实例模式，是加强的singleTask,除了栈内复用，在启动singleInstance模式的Activity时会新创建一个任务栈，并且这个任务栈中只有该实例，后续都不会再创建该Activity的实例，除非这个任务栈由于某种原因被回收了。</p>
+</blockquote>
+<ul>
+<li>以上几种模式，在发出新的启动请求时，如果不创建新的实例，都会调用onNewIntent方法，可以通过这个回调方法的参数来获取每次请求的参数。</li>
+</ul>
+<h3 id="三、IntentFilter的匹配规则"><a href="#三、IntentFilter的匹配规则" class="headerlink" title="三、IntentFilter的匹配规则"></a>三、IntentFilter的匹配规则</h3><blockquote>
+<p>隐式调用需要Intent匹配目标组件IntentFilter所设置的过滤信息，IntentFilter中包含的过滤信息有：action、category、data,Intent匹配过程需要同时匹配这三个过滤信息，否则就会匹配失败。这三种过滤信息的匹配规则是有差异的。</p>
+</blockquote>
+<h4 id="1、action的匹配规则"><a href="#1、action的匹配规则" class="headerlink" title="1、action的匹配规则"></a>1、action的匹配规则</h4><blockquote>
+<p>action是一个字符串，目标组件中的action可以有多个，隐式Intent中指定的action必须和目标组件的action列表中的其中一个完全相同（区分大小写），否则匹配失败，另外Intent中是必须指定action的。</p>
+</blockquote>
+<h4 id="2、catetory匹配规则"><a href="#2、catetory匹配规则" class="headerlink" title="2、catetory匹配规则"></a>2、catetory匹配规则</h4><blockquote>
+<p>category是一个字符串，在写隐式Intent时可以不包含category,如果有一个或者多个，那么所有的都需要和目标组件中的category列表中的任意一个相同，否则匹配失败。在调用startActivity()或者startActivityForResult()时Intent会默认添加上android.intent.category.DEFAULT,这就是为什么在写隐式Inent时可以不包含category的原因，但是这也就意味着我们在定义IntentFilter时如果没有加上</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;category android.name=&quot;android.intent.category.DEFAULT&quot;/&gt;</span><br></pre></td></tr></table></figure>
+<p>这个过滤信息，这个组件就不能被隐式Intent匹配。</p>
+<h4 id="3、data匹配规则"><a href="#3、data匹配规则" class="headerlink" title="3、data匹配规则"></a>3、data匹配规则</h4><blockquote>
+<p>data的语法是相对复杂的。data的匹配规则和action的匹配规则类似，Intent中必须包含data,并且要和过滤器中的其中一个data相同。</p>
+</blockquote>
+<p>excample:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">activity android:name=&quot;.ShareActivity&quot;&gt;</span><br><span class="line">    &lt;intent-filter&gt;</span><br><span class="line">        &lt;action android:name=&quot;com.test.action1&quot;/&gt;</span><br><span class="line">        &lt;action android:name=&quot;com.test.action2&quot;/&gt;</span><br><span class="line">        &lt;category android:name=&quot;android.intent.category.DEFAULT&quot;/&gt;</span><br><span class="line">        &lt;category android:name=&quot;com.test.category1&quot;/&gt;</span><br><span class="line">        &lt;category android:name=&quot;com.test.category2&quot;/&gt;</span><br><span class="line">        &lt;data android:mimeType=&quot;text/plain&quot;/&gt;</span><br><span class="line">        &lt;data android:mimeType=&quot;image/*&quot;/&gt;</span><br><span class="line">        &lt;data android:mimeType=&quot;video/*&quot;/&gt;</span><br><span class="line">    &lt;/intent-filter&gt;</span><br><span class="line">&lt;/activity&gt;</span><br></pre></td></tr></table></figure>
+<p>可以匹配的两个隐式Intent</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = new Intent();</span><br><span class="line">intent.setAction(&quot;com.test.action1&quot;);</span><br><span class="line">intent.addCategory(&quot;com.test.category1&quot;);</span><br><span class="line">intent.setType(&quot;text/plain&quot;);</span><br><span class="line">startActivity(intent);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = new Intent();</span><br><span class="line">intent.setAction(&quot;com.test.action1&quot;);</span><br><span class="line">intent.setType(&quot;text/plain&quot;);</span><br><span class="line">intent.setType(&quot;image/*&quot;);</span><br><span class="line">startActivity(intent);</span><br></pre></td></tr></table></figure>
+<p>上面这个Intent会默认添加</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">intent.addCategory(&quot;android.intent.category.DEFAULT&quot;);</span><br></pre></td></tr></table></figure>
+<p>若去掉IntentFilter中的<br><code>&lt;category android:name=&quot;android.intent.category.DEFAULT&quot;/&gt;</code><br>任何隐式Intent都不能匹配这个组件，原因已在category匹配规则说明。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Android%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="tag"># Android学习笔记</a>
+              <a href="/tags/Activity%E5%90%AF%E5%8A%A8%E6%A8%A1%E5%BC%8F/" rel="tag"># Activity启动模式</a>
+              <a href="/tags/intent-filter/" rel="tag"># intent-filter</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2015/03/27/%E7%AC%AC%E5%85%AD%E5%B1%8A%E8%93%9D%E6%A1%A5%E6%9D%AFJava%20B%E7%BB%84%E7%9C%81%E8%B5%9B%E8%AF%95%E9%A2%98%E7%AD%94%E6%A1%88/" rel="prev" title="第六届蓝桥杯Java B组省赛试题答案">
+                  <i class="fa fa-chevron-left"></i> 第六届蓝桥杯Java B组省赛试题答案
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2017/02/20/Handler%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/" rel="next" title="Handler消息机制">
+                  Handler消息机制 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

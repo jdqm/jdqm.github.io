@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.0.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jdqm.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+  <meta name="description" content="I.简介HTTP是现代应用常用的一种交换数据和媒体的网络方式，高效地使用HTTP能让资源加载更快，节省带宽。OkHttp是一个高效的HTTP客户端，它有以下默认特性：  支持HTTP&#x2F;2，允许所有同一个主机地址的请求共享同一个socket连接 连接池减少请求延时 透明的GZIP压缩减少响应数据的大小 缓存响应内容，避免一些完全重复的请求">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Okhttp3基本使用">
+<meta property="og:url" content="https://jdqm.github.io/2018/04/29/Okhttp3-basic/index.html">
+<meta property="og:site_name" content="Jdqm Blog">
+<meta property="og:description" content="I.简介HTTP是现代应用常用的一种交换数据和媒体的网络方式，高效地使用HTTP能让资源加载更快，节省带宽。OkHttp是一个高效的HTTP客户端，它有以下默认特性：  支持HTTP&#x2F;2，允许所有同一个主机地址的请求共享同一个socket连接 连接池减少请求延时 透明的GZIP压缩减少响应数据的大小 缓存响应内容，避免一些完全重复的请求">
+<meta property="og:locale">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3631399-304a944b5bef663e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3631399-164b722ab35ae9bf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="article:published_time" content="2018-04-29T07:54:30.000Z">
+<meta property="article:modified_time" content="2018-04-29T07:54:30.000Z">
+<meta property="article:author" content="Jdqm">
+<meta property="article:tag" content="-开源项目 -Okhttp3">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/3631399-304a944b5bef663e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+<link rel="canonical" href="https://jdqm.github.io/2018/04/29/Okhttp3-basic/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://jdqm.github.io/2018/04/29/Okhttp3-basic/","path":"2018/04/29/Okhttp3-basic/","title":"Okhttp3基本使用"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Okhttp3基本使用 | Jdqm Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Jdqm Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">正直、善良、脚踏实地</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#I-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">I.简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#II-%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">II.使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Download-OkHttp3"><span class="nav-number">3.</span> <span class="nav-text">Download OkHttp3</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-POST%E6%96%B9%E5%BC%8F%E6%8F%90%E4%BA%A4String"><span class="nav-number">4.</span> <span class="nav-text">2.1. POST方式提交String</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-POST%E6%8F%90%E4%BA%A4%E6%96%87%E4%BB%B6"><span class="nav-number">5.</span> <span class="nav-text">2.3. POST提交文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-POST%E6%96%B9%E5%BC%8F%E6%8F%90%E4%BA%A4%E8%A1%A8%E5%8D%95"><span class="nav-number">6.</span> <span class="nav-text">2.4. POST方式提交表单</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-POST%E6%96%B9%E5%BC%8F%E6%8F%90%E4%BA%A4%E5%88%86%E5%9D%97%E8%AF%B7%E6%B1%82"><span class="nav-number">7.</span> <span class="nav-text">2.5. POST方式提交分块请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#III-%E6%8B%A6%E6%88%AA%E5%99%A8-interceptor"><span class="nav-number">8.</span> <span class="nav-text">III.拦截器-interceptor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IV-%E5%85%B6%E4%BB%96"><span class="nav-number">9.</span> <span class="nav-text">IV.其他</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Jdqm</p>
+  <div class="site-description" itemprop="description">I promise you.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://jdqm.github.io/2018/04/29/Okhttp3-basic/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Jdqm">
+      <meta itemprop="description" content="I promise you.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jdqm Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Okhttp3基本使用
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-04-29 15:54:30" itemprop="dateCreated datePublished" datetime="2018-04-29T15:54:30+08:00">2018-04-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/OpenSource/" itemprop="url" rel="index"><span itemprop="name">OpenSource</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="I-简介"><a href="#I-简介" class="headerlink" title="I.简介"></a>I.简介</h2><p>HTTP是现代应用常用的一种交换数据和媒体的网络方式，高效地使用HTTP能让资源加载更快，节省带宽。OkHttp是一个高效的HTTP客户端，它有以下默认特性：</p>
+<ul>
+<li>支持HTTP&#x2F;2，允许所有同一个主机地址的请求共享同一个socket连接</li>
+<li>连接池减少请求延时</li>
+<li>透明的GZIP压缩减少响应数据的大小</li>
+<li>缓存响应内容，避免一些完全重复的请求<span id="more"></span>
+当网络出现问题的时候OkHttp依然坚守自己的职责，它会自动恢复一般的连接问题，如果你的服务有多个IP地址，当第一个IP请求失败时，OkHttp会交替尝试你配置的其他IP，OkHttp使用现代TLS技术(SNI, ALPN)初始化新的连接，当握手失败时会回退到TLS 1.0。<blockquote>
+<p>note: OkHttp 支持 Android 2.3 及以上版本Android平台， 对于 Java, JDK 1.7及以上.</p>
+</blockquote>
+</li>
+</ul>
+<p>对于Okhttp3的源码阅读预计会写3篇文章来总结：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/da4a806e599b">1.Okhttp的基本使用</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/b0353ed71151">2.Okhttp主流程源码分析</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/9deec36f2759">3.Okhttp3架构分析，主要通过一些流程图类展现</a></li>
+</ul>
+<h2 id="II-使用"><a href="#II-使用" class="headerlink" title="II.使用"></a>II.使用</h2><p>OkHttp的使用是非常简单的. 它的请求&#x2F;响应 API 使用构造器模式builders来设计，它支持阻塞式的同步请求和带回调的异步请求。</p>
+<h2 id="Download-OkHttp3"><a href="#Download-OkHttp3" class="headerlink" title="Download OkHttp3"></a>Download OkHttp3</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">implementation &#x27;com.squareup.okhttp3:okhttp:3.10.0&#x27;</span><br></pre></td></tr></table></figure>
+<p>当你看到这的时候，可能最新的稳定版已经不是3.10.0了，你需要移步官方GitHub来查看最新版本。 <a target="_blank" rel="noopener" href="https://github.com/square/okhttp">官方地址 https://github.com/square/okhttp</a>，另外不要忘了在清单文件声明访问Internet的权限，如果使用 DiskLruCache，那还得声明写外存的权限。</p>
+<p>##1.1. 异步GET请求<br>-new OkHttpClient;<br>-构造Request对象；<br>-通过前两步中的对象构建Call对象；<br>-通过Call#enqueue(Callback)方法来提交异步请求；</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">String url = &quot;http://wwww.baidu.com&quot;;</span><br><span class="line">OkHttpClient okHttpClient = new OkHttpClient();</span><br><span class="line">final Request request = new Request.Builder()</span><br><span class="line">        .url(url)</span><br><span class="line">        .get()//默认就是GET请求，可以不写</span><br><span class="line">        .build();</span><br><span class="line">Call call = okHttpClient.newCall(request);</span><br><span class="line">call.enqueue(new Callback() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void onFailure(Call call, IOException e) &#123;</span><br><span class="line">        Log.d(TAG, &quot;onFailure: &quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void onResponse(Call call, Response response) throws IOException &#123;</span><br><span class="line">        Log.d(TAG, &quot;onResponse: &quot; + response.body().string());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>异步发起的请求会被加入到 Dispatcher 中的 runningAsyncCalls 双端队列中通过线程池来执行。</p>
+<p>##1.2. 同步GET请求<br>前面几个步骤和异步方式一样，只是最后一部是通过 Call#execute() 来提交请求，注意这种方式会阻塞调用线程，所以在Android中应放在子线程中执行，否则有可能引起ANR异常，Android3.0 以后已经不允许在主线程访问网络。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">String url = &quot;http://wwww.baidu.com&quot;;</span><br><span class="line">OkHttpClient okHttpClient = new OkHttpClient();</span><br><span class="line">final Request request = new Request.Builder()</span><br><span class="line">        .url(url)</span><br><span class="line">        .build();</span><br><span class="line">final Call call = okHttpClient.newCall(request);</span><br><span class="line">new Thread(new Runnable() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Response response = call.execute();</span><br><span class="line">            Log.d(TAG, &quot;run: &quot; + response.body().string());</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;).start();</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-1-POST方式提交String"><a href="#2-1-POST方式提交String" class="headerlink" title="2.1. POST方式提交String"></a>2.1. POST方式提交String</h2><p>这种方式与前面的区别就是在构造Request对象时，需要多构造一个RequestBody对象，用它来携带我们要提交的数据。在构造 RequestBody 需要指定 MediaType ，用于描述请求&#x2F;响应 body 的内容类型，关于 MediaType 的更多信息可以查看 <a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc2045">RFC 2045</a>，RequstBody的几种构造方式：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3631399-304a944b5bef663e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="request_body"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">MediaType mediaType = MediaType.parse(&quot;text/x-markdown; charset=utf-8&quot;);</span><br><span class="line">String requestBody = &quot;I am Jdqm.&quot;;</span><br><span class="line">Request request = new Request.Builder()</span><br><span class="line">        .url(&quot;https://api.github.com/markdown/raw&quot;)</span><br><span class="line">        .post(RequestBody.create(mediaType, requestBody))</span><br><span class="line">        .build();</span><br><span class="line">OkHttpClient okHttpClient = new OkHttpClient();</span><br><span class="line">okHttpClient.newCall(request).enqueue(new Callback() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void onFailure(Call call, IOException e) &#123;</span><br><span class="line">        Log.d(TAG, &quot;onFailure: &quot; + e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void onResponse(Call call, Response response) throws IOException &#123;</span><br><span class="line">        Log.d(TAG, response.protocol() + &quot; &quot; +response.code() + &quot; &quot; + response.message());</span><br><span class="line">        Headers headers = response.headers();</span><br><span class="line">        for (int i = 0; i &lt; headers.size(); i++) &#123;</span><br><span class="line">            Log.d(TAG, headers.name(i) + &quot;:&quot; + headers.value(i));</span><br><span class="line">        &#125;</span><br><span class="line">        Log.d(TAG, &quot;onResponse: &quot; + response.body().string());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>响应内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">http/1.1 200 OK </span><br><span class="line">Date:Sat, 10 Mar 2018 05:23:20 GMT </span><br><span class="line">Content-Type:text/html;charset=utf-8</span><br><span class="line">Content-Length:18</span><br><span class="line">Server:GitHub.com </span><br><span class="line">Status:200 OK </span><br><span class="line">X-RateLimit-Limit:60</span><br><span class="line">X-RateLimit-Remaining:52</span><br><span class="line">X-RateLimit-Reset:1520661052</span><br><span class="line">X-CommonMarker-Version:0.17.4</span><br><span class="line">Access-Control-Expose-Headers:ETag, Link, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval</span><br><span class="line"></span><br><span class="line">Access-Control-Allow-Origin:*</span><br><span class="line">Content-Security-Policy:default-src &#x27;none&#x27;</span><br><span class="line">Strict-Transport-Security:max-age=31536000; includeSubdomains; preload </span><br><span class="line">X-Content-Type-Options:nosniff </span><br><span class="line">X-Frame-Options:deny </span><br><span class="line">X-XSS-Protection:1; mode=block </span><br><span class="line">X-Runtime-rack:0.019668</span><br><span class="line">Vary:Accept-Encoding </span><br><span class="line">X-GitHub-Request-Id:1474:20A83:5CC0B6:7A7C1B:5AA36BC8 </span><br><span class="line">onResponse: &lt;p&gt;I am Jdqm.&lt;/p&gt;</span><br></pre></td></tr></table></figure>
+
+<p>##2.2 POST方式提交流</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">RequestBody requestBody = new RequestBody() &#123;</span><br><span class="line">    @Nullable</span><br><span class="line">    @Override</span><br><span class="line">    public MediaType contentType() &#123;</span><br><span class="line">        return MediaType.parse(&quot;text/x-markdown; charset=utf-8&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void writeTo(BufferedSink sink) throws IOException &#123;</span><br><span class="line">        sink.writeUtf8(&quot;I am Jdqm.&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Request request = new Request.Builder()</span><br><span class="line">        .url(&quot;https://api.github.com/markdown/raw&quot;)</span><br><span class="line">        .post(requestBody)</span><br><span class="line">        .build();</span><br><span class="line">OkHttpClient okHttpClient = new OkHttpClient();</span><br><span class="line">okHttpClient.newCall(request).enqueue(new Callback() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void onFailure(Call call, IOException e) &#123;</span><br><span class="line">        Log.d(TAG, &quot;onFailure: &quot; + e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void onResponse(Call call, Response response) throws IOException &#123;</span><br><span class="line">        Log.d(TAG, response.protocol() + &quot; &quot; +response.code() + &quot; &quot; + response.message());</span><br><span class="line">        Headers headers = response.headers();</span><br><span class="line">        for (int i = 0; i &lt; headers.size(); i++) &#123;</span><br><span class="line">            Log.d(TAG, headers.name(i) + &quot;:&quot; + headers.value(i));</span><br><span class="line">        &#125;</span><br><span class="line">        Log.d(TAG, &quot;onResponse: &quot; + response.body().string());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3-POST提交文件"><a href="#2-3-POST提交文件" class="headerlink" title="2.3. POST提交文件"></a>2.3. POST提交文件</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">MediaType mediaType = MediaType.parse(&quot;text/x-markdown; charset=utf-8&quot;);</span><br><span class="line">OkHttpClient okHttpClient = new OkHttpClient();</span><br><span class="line">File file = new File(&quot;test.md&quot;);</span><br><span class="line">Request request = new Request.Builder()</span><br><span class="line">        .url(&quot;https://api.github.com/markdown/raw&quot;)</span><br><span class="line">        .post(RequestBody.create(mediaType, file))</span><br><span class="line">        .build();</span><br><span class="line">okHttpClient.newCall(request).enqueue(new Callback() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void onFailure(Call call, IOException e) &#123;</span><br><span class="line">        Log.d(TAG, &quot;onFailure: &quot; + e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void onResponse(Call call, Response response) throws IOException &#123;</span><br><span class="line">        Log.d(TAG, response.protocol() + &quot; &quot; +response.code() + &quot; &quot; + response.message());</span><br><span class="line">        Headers headers = response.headers();</span><br><span class="line">        for (int i = 0; i &lt; headers.size(); i++) &#123;</span><br><span class="line">            Log.d(TAG, headers.name(i) + &quot;:&quot; + headers.value(i));</span><br><span class="line">        &#125;</span><br><span class="line">        Log.d(TAG, &quot;onResponse: &quot; + response.body().string());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h2 id="2-4-POST方式提交表单"><a href="#2-4-POST方式提交表单" class="headerlink" title="2.4. POST方式提交表单"></a>2.4. POST方式提交表单</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">OkHttpClient okHttpClient = new OkHttpClient();</span><br><span class="line">RequestBody requestBody = new FormBody.Builder()</span><br><span class="line">        .add(&quot;search&quot;, &quot;Jurassic Park&quot;)</span><br><span class="line">        .build();</span><br><span class="line">Request request = new Request.Builder()</span><br><span class="line">        .url(&quot;https://en.wikipedia.org/w/index.php&quot;)</span><br><span class="line">        .post(requestBody)</span><br><span class="line">        .build();</span><br><span class="line"></span><br><span class="line">okHttpClient.newCall(request).enqueue(new Callback() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void onFailure(Call call, IOException e) &#123;</span><br><span class="line">        Log.d(TAG, &quot;onFailure: &quot; + e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void onResponse(Call call, Response response) throws IOException &#123;</span><br><span class="line">        Log.d(TAG, response.protocol() + &quot; &quot; +response.code() + &quot; &quot; + response.message());</span><br><span class="line">        Headers headers = response.headers();</span><br><span class="line">        for (int i = 0; i &lt; headers.size(); i++) &#123;</span><br><span class="line">            Log.d(TAG, headers.name(i) + &quot;:&quot; + headers.value(i));</span><br><span class="line">        &#125;</span><br><span class="line">        Log.d(TAG, &quot;onResponse: &quot; + response.body().string());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>提交表单时，使用 RequestBody 的实现类 FormBody 来描述请求体，它可以携带一些经过编码的 key-value 请求体，键值对存储在下面两个集合中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">private final List&lt;String&gt; encodedNames;</span><br><span class="line">private final List&lt;String&gt; encodedValues;</span><br></pre></td></tr></table></figure>
+<h2 id="2-5-POST方式提交分块请求"><a href="#2-5-POST方式提交分块请求" class="headerlink" title="2.5. POST方式提交分块请求"></a>2.5. POST方式提交分块请求</h2><p>MultipartBody 可以构建复杂的请求体，与HTML文件上传形式兼容。多块请求体中每块请求都是一个请求体，可以定义自己的请求头。这些请求头可以用来描述这块请求，例如它的 Content-Disposition 。如果 Content-Length 和 Content-Type 可用的话，他们会被自动添加到请求头中。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">private static final String IMGUR_CLIENT_ID = &quot;...&quot;;</span><br><span class="line">private static final MediaType MEDIA_TYPE_PNG = MediaType.parse(&quot;image/png&quot;);</span><br><span class="line"></span><br><span class="line">private void postMultipartBody() &#123;</span><br><span class="line">    OkHttpClient client = new OkHttpClient();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    // Use the imgur image upload API as documented at https://api.imgur.com/endpoints/image</span><br><span class="line">    MultipartBody body = new MultipartBody.Builder(&quot;AaB03x&quot;)</span><br><span class="line">            .setType(MultipartBody.FORM)</span><br><span class="line">            .addPart(</span><br><span class="line">                    Headers.of(&quot;Content-Disposition&quot;, &quot;form-data; name=\&quot;title\&quot;&quot;),</span><br><span class="line">                    RequestBody.create(null, &quot;Square Logo&quot;))</span><br><span class="line">            .addPart(</span><br><span class="line">                    Headers.of(&quot;Content-Disposition&quot;, &quot;form-data; name=\&quot;image\&quot;&quot;),</span><br><span class="line">                    RequestBody.create(MEDIA_TYPE_PNG, new File(&quot;website/static/logo-square.png&quot;)))</span><br><span class="line">            .build();</span><br><span class="line"></span><br><span class="line">    Request request = new Request.Builder()</span><br><span class="line">            .header(&quot;Authorization&quot;, &quot;Client-ID &quot; + IMGUR_CLIENT_ID)</span><br><span class="line">            .url(&quot;https://api.imgur.com/3/image&quot;)</span><br><span class="line">            .post(body)</span><br><span class="line">            .build();</span><br><span class="line"></span><br><span class="line">    Call call = client.newCall(request);</span><br><span class="line">    call.enqueue(new Callback() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public void onFailure(Call call, IOException e) &#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void onResponse(Call call, Response response) throws IOException &#123;</span><br><span class="line">            System.out.println(response.body().string());</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="III-拦截器-interceptor"><a href="#III-拦截器-interceptor" class="headerlink" title="III.拦截器-interceptor"></a>III.拦截器-interceptor</h2><p>OkHttp的拦截器链可谓是其整个框架的精髓，用户可传入的 interceptor 分为两类：<br>①一类是全局的 interceptor，该类 interceptor 在整个拦截器链中最早被调用，通过 OkHttpClient.Builder#addInterceptor(Interceptor) 传入；<br>②另外一类是非网页请求的 interceptor ，这类拦截器只会在非网页请求中被调用，并且是在组装完请求之后，真正发起网络请求前被调用，所有的 interceptor 被保存在 List<Interceptor> interceptors 集合中，按照添加顺序来逐个调用，具体可参考 RealCall#getResponseWithInterceptorChain() 方法。通过 OkHttpClient.Builder#addNetworkInterceptor(Interceptor)  传入；</p>
+<p>这里举一个简单的例子，例如有这样一个需求，我要监控App通过 OkHttp 发出的所有原始请求，以及整个请求所耗费的时间，针对这样的需求就可以使用第一类全局的 interceptor 在拦截器链头去做。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">OkHttpClient okHttpClient = new OkHttpClient.Builder()</span><br><span class="line">        .addInterceptor(new LoggingInterceptor())</span><br><span class="line">        .build();</span><br><span class="line">Request request = new Request.Builder()</span><br><span class="line">        .url(&quot;http://www.publicobject.com/helloworld.txt&quot;)</span><br><span class="line">        .header(&quot;User-Agent&quot;, &quot;OkHttp Example&quot;)</span><br><span class="line">        .build();</span><br><span class="line">okHttpClient.newCall(request).enqueue(new Callback() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void onFailure(Call call, IOException e) &#123;</span><br><span class="line">        Log.d(TAG, &quot;onFailure: &quot; + e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void onResponse(Call call, Response response) throws IOException &#123;</span><br><span class="line">        ResponseBody body = response.body();</span><br><span class="line">        if (body != null) &#123;</span><br><span class="line">            Log.d(TAG, &quot;onResponse: &quot; + response.body().string());</span><br><span class="line">            body.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class LoggingInterceptor implements Interceptor &#123;</span><br><span class="line">    private static final String TAG = &quot;LoggingInterceptor&quot;;</span><br><span class="line">    </span><br><span class="line">    @Override</span><br><span class="line">    public Response intercept(Chain chain) throws IOException &#123;</span><br><span class="line">        Request request = chain.request();</span><br><span class="line"></span><br><span class="line">        long startTime = System.nanoTime();</span><br><span class="line">        Log.d(TAG, String.format(&quot;Sending request %s on %s%n%s&quot;,</span><br><span class="line">                request.url(), chain.connection(), request.headers()));</span><br><span class="line"></span><br><span class="line">        Response response =  chain.proceed(request);</span><br><span class="line"></span><br><span class="line">        long endTime = System.nanoTime();</span><br><span class="line">        Log.d(TAG, String.format(&quot;Received response for %s in %.1fms%n%s&quot;,</span><br><span class="line">                response.request().url(), (endTime - startTime) / 1e6d, response.headers()));</span><br><span class="line"></span><br><span class="line">        return response;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>针对这个请求，打印出来的结果</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Sending request http://www.publicobject.com/helloworld.txt on null</span><br><span class="line">User-Agent: OkHttp Example</span><br><span class="line">        </span><br><span class="line">Received response for https://publicobject.com/helloworld.txt in 1265.9ms</span><br><span class="line">Server: nginx/1.10.0 (Ubuntu)</span><br><span class="line">Date: Wed, 28 Mar 2018 08:19:48 GMT</span><br><span class="line">Content-Type: text/plain</span><br><span class="line">Content-Length: 1759</span><br><span class="line">Last-Modified: Tue, 27 May 2014 02:35:47 GMT</span><br><span class="line">Connection: keep-alive</span><br><span class="line">ETag: &quot;5383fa03-6df&quot;</span><br><span class="line">Accept-Ranges: bytes</span><br></pre></td></tr></table></figure>
+<p>注意到一点是这个请求做了重定向，原始的 request url 是 <a target="_blank" rel="noopener" href="http://www.publicobject.com/helloworld.tx%EF%BC%8C%E8%80%8C%E5%93%8D%E5%BA%94%E7%9A%84">http://www.publicobject.com/helloworld.tx，而响应的</a> request url 是 <a target="_blank" rel="noopener" href="https://publicobject.com/helloworld.txt%EF%BC%8C%E8%BF%99%E8%AF%B4%E6%98%8E%E4%B8%80%E5%AE%9A%E5%8F%91%E7%94%9F%E4%BA%86%E9%87%8D%E5%AE%9A%E5%90%91%EF%BC%8C%E4%BD%86%E6%98%AF%E5%81%9A%E4%BA%86%E5%87%A0%E6%AC%A1%E9%87%8D%E5%AE%9A%E5%90%91%E5%85%B6%E5%AE%9E%E6%88%91%E4%BB%AC%E8%BF%99%E9%87%8C%E6%98%AF%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84%EF%BC%8C%E8%A6%81%E7%9F%A5%E9%81%93%E8%BF%99%E4%BA%9B%E7%9A%84%E8%AF%9D%EF%BC%8C%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8">https://publicobject.com/helloworld.txt，这说明一定发生了重定向，但是做了几次重定向其实我们这里是不知道的，要知道这些的话，可以使用</a> addNetworkInterceptor()去做。更多的关于 interceptor的使用以及它们各自的优缺点，请移步OkHttp<a target="_blank" rel="noopener" href="https://github.com/square/okhttp/wiki/Interceptors">官方说明文档</a>。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/3631399-164b722ab35ae9bf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="完整interceptor-chain"></p>
+<h2 id="IV-其他"><a href="#IV-其他" class="headerlink" title="IV.其他"></a>IV.其他</h2><ol>
+<li>推荐让 OkHttpClient 保持单例，用同一个 OkHttpClient 实例来执行你的所有请求，因为每一个 OkHttpClient 实例都拥有自己的连接池和线程池，重用这些资源可以减少延时和节省资源，如果为每个请求创建一个 OkHttpClient 实例，显然就是一种资源的浪费。当然，也可以使用如下的方式来创建一个新的 OkHttpClient 实例，它们共享连接池、线程池和配置信息。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">OkHttpClient eagerClient = client.newBuilder()</span><br><span class="line">    .readTimeout(500, TimeUnit.MILLISECONDS)</span><br><span class="line">    .build();</span><br><span class="line">Response response = eagerClient.newCall(request).execute();</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>每一个Call（其实现是RealCall）只能执行一次，否则会报异常，具体参见 RealCall#execute()</li>
+</ol>
+<p>相关阅读</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/da4a806e599b">1.Okhttp的基本使用</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/b0353ed71151">2.Okhttp主流程源码分析</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/9deec36f2759">3.Okhttp3架构分析，主要通过一些流程图类展现</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE-Okhttp3/" rel="tag"># -开源项目 -Okhttp3</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/11/05/do-you-like-programme/" rel="prev" title="你喜欢写代码吗">
+                  <i class="fa fa-chevron-left"></i> 你喜欢写代码吗
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/04/29/Okhttp3-source/" rel="next" title="Okhttp3源码分析">
+                  Okhttp3源码分析 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jdqm</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
