@@ -27,7 +27,7 @@
 <meta property="og:site_name" content="Jdqm Blog">
 <meta property="og:description" content="一、垃圾收集器1.如何确定对象已死1.1.引用计数法-Reference Counting给对象添加一个引用计数器，当有新的地方引用它时，引用计数器加1，当引用失效时，计数器减1，任意时刻计数器为0的对象就是不可能被再使用了。这种方式实现简单且高效，但是很难解决循环引用的问题，例如有两个对象A、B，除了相互引用之外，并没有可达引用可以访问到它们中的任意一个，这种情况下其实它们已经是垃圾对象，但是">
 <meta property="og:locale">
-<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3631399-037b98e4397e4558.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://raw.githubusercontent.com/jdqm/blog/master/images/jvm2_slogan.jpeg">
 <meta property="og:image" content="https://upload-images.jianshu.io/upload_images/3631399-22b103240b2dbe00.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 <meta property="article:published_time" content="2018-05-12T15:28:36.000Z">
 <meta property="article:modified_time" content="2018-05-12T15:28:36.000Z">
@@ -36,7 +36,7 @@
 <meta property="article:tag" content="垃圾回收器">
 <meta property="article:tag" content="内存分配">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/3631399-037b98e4397e4558.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jdqm/blog/master/images/jvm2_slogan.jpeg">
 
 
 <link rel="canonical" href="https://jdqm.github.io/2018/05/12/jvm-collector/">
@@ -224,7 +224,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p><img src="https://upload-images.jianshu.io/upload_images/3631399-037b98e4397e4558.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="2018-05-09"></p>
+        <p><img src="https://raw.githubusercontent.com/jdqm/blog/master/images/jvm2_slogan.jpeg" alt="2018-05-09"></p>
 <h1 id="一、垃圾收集器"><a href="#一、垃圾收集器" class="headerlink" title="一、垃圾收集器"></a>一、垃圾收集器</h1><h2 id="1-如何确定对象已死"><a href="#1-如何确定对象已死" class="headerlink" title="1.如何确定对象已死"></a>1.如何确定对象已死</h2><h3 id="1-1-引用计数法-Reference-Counting"><a href="#1-1-引用计数法-Reference-Counting" class="headerlink" title="1.1.引用计数法-Reference Counting"></a>1.1.引用计数法-Reference Counting</h3><p>给对象添加一个引用计数器，当有新的地方引用它时，引用计数器加1，当引用失效时，计数器减1，任意时刻计数器为0的对象就是不可能被再使用了。这种方式实现简单且高效，但是很难解决循环引用的问题，例如有两个对象A、B，除了相互引用之外，并没有可达引用可以访问到它们中的任意一个，这种情况下其实它们已经是垃圾对象，但是它们的引用计数器都不为零。</p>
 <span id="more"></span>
 <h3 id="1-2-可达性分析-Reachability-Analysis"><a href="#1-2-可达性分析-Reachability-Analysis" class="headerlink" title="1.2.可达性分析-Reachability Analysis"></a>1.2.可达性分析-Reachability Analysis</h3><p>这个方法的基本思想是通过一系列的称为 “GC Root”的对象作为起点，从这些节点往下搜索，所经过的路径称为引用链，当一个对象到“GC Root”没有任何引用链相连时，则证明此对象是不可用的。这一些列GC Root对象是哪些对象呢？</p>
